@@ -9,6 +9,9 @@ import { TaskProviderApi } from './context/TaskContextApi';
 import type { ReactNode } from 'react';
 import Login from './pages/Login';
 import LoginPassword from './pages/LoginPassword';
+import Welcome from './pages/Welcome';
+import TellUsAboutWork from './pages/TellUsAboutWork';
+import WhatToolsDoYouUse from './pages/WhatToolsDoYouUse';
 import Home from './pages/Home';
 import MyTasks from './pages/MyTasks';
 import BrowseProjects from './pages/BrowseProjects';
@@ -20,6 +23,11 @@ import Search from './pages/Search';
 import Profile from './pages/Profile';
 import NewProject from './pages/NewProject';
 import ProjectDetail from './pages/ProjectDetail';
+import SetupFirstProject from './pages/SetupFirstProject';
+import SetupTasks from './pages/SetupTasks';
+import SetupSections from './pages/SetupSections';
+import SetupLayout from './pages/SetupLayout';
+import SetupInvite from './pages/SetupInvite';
 import './App.css';
 
 // Wrap with appropriate provider based on config
@@ -39,6 +47,14 @@ function App() {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/login-password" element={<LoginPassword />} />
+              <Route path="/welcome" element={<Welcome />} />
+              <Route path="/tell-us-about-work" element={<TellUsAboutWork />} />
+              <Route path="/what-tools-do-you-use" element={<WhatToolsDoYouUse />} />
+              <Route path="/setup-first-project" element={<SetupFirstProject />} />
+              <Route path="/setup-tasks" element={<SetupTasks />} />
+              <Route path="/setup-sections" element={<SetupSections />} />
+              <Route path="/setup-layout" element={<SetupLayout />} />
+              <Route path="/setup-invite" element={<SetupInvite />} />
               <Route path="/home" element={<Home />} />
               <Route path="/my-tasks" element={<MyTasks />} />
               <Route path="/projects" element={<BrowseProjects />} />

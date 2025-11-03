@@ -8,9 +8,11 @@ function Login() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // For demo purposes, navigate to home on any email
+    // For demo purposes, navigate to welcome page on any email
     if (email) {
-      navigate('/home');
+      // Store email for welcome page
+      localStorage.setItem('signupEmail', email);
+      navigate('/welcome');
     }
   };
 
@@ -33,7 +35,7 @@ function Login() {
               To get started, please sign in
             </h3>
             <div className="LoginDefaultView-content">
-              <div className="ButtonThemeablePresentation--isEnabled ButtonThemeablePresentation ButtonThemeablePresentation--xlarge ButtonSecondaryPresentation ButtonSecondaryPresentation--sentimentDefault SecondaryButton GoogleSignInButton--sparse GoogleSignInButton LoginDefaultView-ssoButton HighlightSol HighlightSol--core HighlightSol--buildingBlock Stack Stack--align-center Stack--direction-row Stack--display-inline Stack--justify-center" role="button" tabIndex={0} onClick={() => navigate('/home')}>
+              <div className="ButtonThemeablePresentation--isEnabled ButtonThemeablePresentation ButtonThemeablePresentation--xlarge ButtonSecondaryPresentation ButtonSecondaryPresentation--sentimentDefault SecondaryButton GoogleSignInButton--sparse GoogleSignInButton LoginDefaultView-ssoButton HighlightSol HighlightSol--core HighlightSol--buildingBlock Stack Stack--align-center Stack--direction-row Stack--display-inline Stack--justify-center" role="button" tabIndex={0} onClick={() => { localStorage.setItem('signupEmail', 'user@gmail.com'); navigate('/welcome'); }}>
                 <svg className="ButtonThemeablePresentation-leftIcon GoogleSignInButton-logo--sparse GoogleSignInButton-logo" viewBox="0 0 18 18">
                   <path d="M17.64,9.20454545 C17.64,8.56636364 17.5827273,7.95272727 17.4763636,7.36363636 L9,7.36363636 L9,10.845 L13.8436364,10.845 C13.635,11.97 13.0009091,12.9231818 12.0477273,13.5613636 L12.0477273,15.8195455 L14.9563636,15.8195455 C16.6581818,14.2527273 17.64,11.9454545 17.64,9.20454545 L17.64,9.20454545 Z" fill="#4285F4"></path>
                   <path d="M9,18 C11.43,18 13.4672727,17.1940909 14.9563636,15.8195455 L12.0477273,13.5613636 C11.2418182,14.1013636 10.2109091,14.4204545 9,14.4204545 C6.65590909,14.4204545 4.67181818,12.8372727 3.96409091,10.71 L0.957272727,10.71 L0.957272727,13.0418182 C2.43818182,15.9831818 5.48181818,18 9,18 L9,18 Z" fill="#34A853"></path>
