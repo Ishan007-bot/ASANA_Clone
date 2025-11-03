@@ -1,0 +1,211 @@
+// Prisma Schema for Asana Clone - Merged from both backends
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                      String   @id @default(uuid())
+  email                   String   @unique
+  passwordHash            String?  @map("password_hash")
+  name                    String?
+  avatarUrl               String?  @map("avatar_url")
+  initials                String?
+  theme                   String   @default("dark")
+  notificationPreferences Json?    @default("{}") @map("notification_preferences")
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  assignedTasks           Task[]           @relation("TaskAssignee")
+  createdTasks            Task[]           @relation("TaskCreator")
+  teamMemberships         TeamMember[]
+  projectMemberships      ProjectMember[]
+  comments                Comment[]
+  reactions               CommentReaction[]
+  activityLogs            ActivityLog[]
+  
+  @@map("users")
+}
+
+model Workspace {
+  id        String   @id @default(uuid())
+  name      String
+  description String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  projects Project[]
+  teams    Team[]
+  
+  @@map("workspaces")
+}
+
+model Team {
+  id          String   @id @default(uuid())
+  workspaceId String?  @map("workspace_id")
+  name        String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  workspace   Workspace?     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
+  projects    Project[]
+  
+  @@map("teams")
+}
+
+model TeamMember {
+  id        String   @id @default(uuid())
+  teamId    String   @map("team_id")
+  userId    String   @map("user_id")
+  role      String   @default("member") // member, admin, viewer
+  joinedAt  DateTime @default(now()) @map("joined_at")
+  
+  // Relations
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([teamId, userId])
+  @@map("team_members")
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  teamId      String?  @map("team_id")
+  workspaceId String?  @map("workspace_id")
+  name        String
+  description String?
+  color       String?
+  icon        String?
+  ownerId     String?  @map("owner_id")
+  viewType    String   @default("list") @map("view_type") // list, board, timeline
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  team        Team?            @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  workspace   Workspace?       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  sections    Section[]
+  tasks       Task[]
+  members     ProjectMember[]
+  
+  @@map("projects")
+}
+
+model ProjectMember {
+  id        String   @id @default(uuid())
+  projectId String   @map("project_id")
+  userId    String   @map("user_id")
+  role      String   @default("member") // member, admin, viewer
+  
+  // Relations
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([projectId, userId])
+  @@map("project_members")
+}
+
+model Section {
+  id        String   @id @default(uuid())
+  projectId String   @map("project_id")
+  name      String
+  position  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks     Task[]
+  
+  @@map("sections")
+}
+
+model Task {
+  id          String    @id @default(uuid())
+  projectId   String?   @map("project_id")
+  sectionId   String?   @map("section_id")
+  parentTaskId String?   @map("parent_task_id")
+  name        String
+  description String?
+  completed   Boolean   @default(false)
+  dueDate     DateTime? @map("due_date")
+  dueTime     DateTime? @map("due_time")
+  assigneeId  String?   @map("assignee_id")
+  creatorId   String?   @map("created_by")
+  priority    String    @default("medium") // low, medium, high
+  tags        String[]   @default([])
+  position    Int       @default(0)
+  completedAt DateTime?  @map("completed_at")
+  completedBy String?   @map("completed_by")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  
+  // Relations
+  project     Project?    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  section     Section?   @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  assignee    User?       @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  creator     User?       @relation("TaskCreator", fields: [creatorId], references: [id], onDelete: SetNull)
+  parentTask  Task?       @relation("Subtask", fields: [parentTaskId], references: [id], onDelete: Cascade)
+  subtasks    Task[]      @relation("Subtask")
+  comments    Comment[]
+  activityLogs ActivityLog[]
+  
+  @@map("tasks")
+}
+
+model Comment {
+  id              String   @id @default(uuid())
+  taskId          String   @map("task_id")
+  parentCommentId String?  @map("parent_comment_id")
+  userId          String   @map("user_id")
+  content         String   // Markdown support
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  task            Task             @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentComment   Comment?         @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  replies         Comment[]        @relation("CommentReplies")
+  reactions       CommentReaction[]
+  
+  @@map("comments")
+}
+
+model CommentReaction {
+  id        String   @id @default(uuid())
+  commentId String   @map("comment_id")
+  userId    String   @map("user_id")
+  emoji     String
+  
+  // Relations
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([commentId, userId, emoji])
+  @@map("comment_reactions")
+}
+
+model ActivityLog {
+  id           String   @id @default(uuid())
+  taskId       String?  @map("task_id")
+  userId       String   @map("user_id")
+  actionType   String   @map("action_type") // created, updated, completed, deleted, assigned, etc.
+  actionDetails Json?   @default("{}") @map("action_details")
+  createdAt    DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  task         Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("activity_log")
+}

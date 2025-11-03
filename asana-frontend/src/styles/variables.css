@@ -1,0 +1,109 @@
+/* CSS Variables for Theme System */
+:root {
+  /* Light Theme (Default) */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --bg-card: #ffffff;
+  --bg-hover: #f9fafb;
+  --bg-selected: #e5e7eb;
+  --bg-input: #ffffff;
+  
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --text-disabled: #d1d5db;
+  --text-inverse: #ffffff;
+  
+  --border-primary: #e5e7eb;
+  --border-secondary: #d1d5db;
+  --border-tertiary: #f3f4f6;
+  
+  --accent-primary: #4573d2;
+  --accent-primary-hover: #3b66c0;
+  --accent-secondary: #ec4899;
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-error: #ef4444;
+  --accent-info: #3b82f6;
+  
+  --avatar-pink: #ec4899;
+  --avatar-blue: #3b82f6;
+  --avatar-yellow: #eab308;
+  --avatar-purple: #a855f7;
+  --avatar-cyan: #06b6d4;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Theme */
+html[data-theme="dark"],
+[data-theme="dark"] {
+  --bg-primary: transparent;
+  --bg-secondary: #1f1f1f;
+  --bg-tertiary: #262626;
+  --bg-card: #1f1f1f;
+  --bg-hover: #262626;
+  --bg-selected: #374151;
+  --bg-input: #1f1f1f;
+  
+  --text-primary: #ffffff;
+  --text-secondary: #d1d5db;
+  --text-tertiary: #9ca3af;
+  --text-disabled: #6b7280;
+  --text-inverse: #111827;
+  
+  --border-primary: #374151;
+  --border-secondary: #4b5563;
+  --border-tertiary: #1f1f1f;
+  
+  --accent-primary: #4573d2;
+  --accent-primary-hover: #5b8ae8;
+  --accent-secondary: #ec4899;
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-error: #ef4444;
+  --accent-info: #3b82f6;
+  
+  --avatar-pink: #ec4899;
+  --avatar-blue: #3b82f6;
+  --avatar-yellow: #eab308;
+  --avatar-purple: #a855f7;
+  --avatar-cyan: #06b6d4;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+/* Apply theme colors to body and root elements */
+html,
+body {
+  background-color: #3A3A3C !important;
+  background: #3A3A3C !important;
+  color: var(--text-primary) !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#app,
+#asana,
+.AppRoot,
+.AsanaMain {
+  background-color: #3A3A3C !important;
+  background: #3A3A3C !important;
+  color: var(--text-primary) !important;
+}
+
+/* Force theme application for common elements - only remove backgrounds from parent containers, let pages control their own */
+[data-theme="dark"] .HomePageContent,
+[data-theme="dark"] .HomeContentArea,
+/* [data-theme="dark"] .GlobalTopbar, */
+/* [data-theme="dark"] .Sidebar, */
+/* Removed background overrides for page content containers - let pages set their own backgrounds */
+
+* {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+

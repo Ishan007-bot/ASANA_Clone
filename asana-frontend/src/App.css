@@ -1,0 +1,1260 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#app {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Allow scrolling in main content area - ensure content can overflow */
+.AsanaMain-asanaPageAndTopbar {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Comprehensive Responsive Design */
+
+/* Mobile First - Base styles for mobile */
+@media (max-width: 640px) {
+  /* Layout adjustments */
+  .SidebarResizableContainer {
+    position: fixed;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    height: 100vh;
+    background: #3A3A3C !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    left: 0 !important;
+  }
+  
+  .SidebarResizableContainer:not(.collapsed) {
+    transform: translateX(0);
+  }
+  
+  .AsanaMain-asanaPageAndTopbar {
+    width: 100%;
+    padding: 0;
+  }
+
+  /* Typography scaling */
+  .TypographyPresentation--h1 {
+    font-size: 1.75rem !important;
+  }
+  
+  .TypographyPresentation--h2 {
+    font-size: 1.5rem !important;
+  }
+  
+  .TypographyPresentation--h3 {
+    font-size: 1.25rem !important;
+  }
+  
+  .TypographyPresentation--h4 {
+    font-size: 1.125rem !important;
+  }
+
+  /* Buttons */
+  .ButtonThemeablePresentation--xlarge,
+  .ButtonThemeablePresentation--large {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  /* Forms */
+  .FormRowLayout {
+    margin-bottom: 16px;
+  }
+
+  .TextInput,
+  .TextInputBase {
+    width: 100%;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  /* Cards and containers */
+  .HomeCard-container,
+  .ThemeableCardPresentation {
+    margin-bottom: 16px;
+    padding: 16px;
+  }
+
+  /* Page headers */
+  .PageHeader {
+    padding: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  @media (min-width: 641px) {
+    .PageHeader {
+      padding: 16px 24px;
+    }
+  }
+
+  .PageHeaderThemeablePresentation-titleGroup {
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  /* Login page */
+  .LoginCardLayout-card {
+    width: 100%;
+    max-width: 100%;
+    padding: 24px 16px;
+    margin: 0;
+  }
+
+  .LoginStickyLogoBar {
+    padding: 16px;
+  }
+
+  .LoginFooter-navRow {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .LoginFooter-navRowItem {
+    margin: 4px 8px;
+  }
+
+  /* Tables and grids */
+  /* Project Detail Page Dark Theme */
+  .ProjectDetailPage,
+  .ProjectDetailContent,
+  .FullWidthPageStructureWithDetailsOverlay,
+  .FullWidthPageStructureWithDetailsOverlay-fullWidth,
+  .FullWidthPageStructureWithDetailsOverlay-mainContent,
+  .PotListPage,
+  .PageToolbarStructure,
+  .SpreadsheetGridScroller-container,
+  .SpreadsheetPotGridBody,
+  .SpreadsheetPotGridBodyPlaceholder,
+  .SpreadsheetHeaderStructure,
+  .SpreadsheetHeaderStructure-left,
+  .SpreadsheetHeaderLeftStructure,
+  .SpreadsheetHeaderColumn,
+  .BoardView {
+    background-color: #1E1F21 !important;
+  }
+
+  .PageHeader,
+  .PageHeader--border {
+    background-color: #1E1F21 !important;
+  }
+
+  /* Ensure all headings are light colored (not dark) - COMPREHENSIVE */
+  h1, h2, h3, h4, h5, h6 {
+    color: rgb(245, 244, 243) !important;
+  }
+
+  /* TypographyPresentation heading classes should be light */
+  .TypographyPresentation--h1,
+  .TypographyPresentation--h2,
+  .TypographyPresentation--h3,
+  .TypographyPresentation--h4,
+  .TypographyPresentation--h5,
+  .TypographyPresentation--h6 {
+    color: rgb(245, 244, 243) !important;
+  }
+
+  /* TypographyPresentation--colorDefault when used with headings */
+  .TypographyPresentation--colorDefault {
+    color: rgb(245, 244, 243) !important;
+  }
+
+  /* Override any dark colors for headings */
+  h1.TypographyPresentation,
+  h2.TypographyPresentation,
+  h3.TypographyPresentation,
+  h4.TypographyPresentation,
+  h5.TypographyPresentation,
+  h6.TypographyPresentation,
+  h1 .TypographyPresentation,
+  h2 .TypographyPresentation,
+  h3 .TypographyPresentation,
+  h4 .TypographyPresentation,
+  h5 .TypographyPresentation,
+  h6 .TypographyPresentation {
+    color: rgb(245, 244, 243) !important;
+  }
+
+  /* Page header titles */
+  .PageHeaderNonEditableTitle,
+  .PageHeaderThemeablePresentation-title h1,
+  .PageHeaderThemeablePresentation-title h2,
+  .PageHeaderThemeablePresentation-title h3,
+  .PageHeaderThemeablePresentation-title h4 {
+    color: rgb(245, 244, 243) !important;
+  }
+
+  /* Specific heading combinations */
+  h1.TypographyPresentation--colorDefault,
+  h2.TypographyPresentation--colorDefault,
+  h3.TypographyPresentation--colorDefault,
+  h4.TypographyPresentation--colorDefault,
+  h5.TypographyPresentation--colorDefault,
+  h6.TypographyPresentation--colorDefault {
+    color: rgb(245, 244, 243) !important;
+  }
+
+  /* Sidebar headings should also be light */
+  .SidebarUpdatedCollapsibleHeader-dropdownMenuLabel,
+  h2.TypographyPresentation--colorNavigation,
+  h3.TypographyPresentation--colorNavigation,
+  h4.TypographyPresentation--colorNavigation {
+    color: rgb(245, 244, 243) !important;
+  }
+
+  /* Modal headings */
+  .ModalManager h1,
+  .ModalManager h2,
+  .ModalManager h3,
+  .ModalManager h4,
+  .ModalManager .TypographyPresentation--colorDefault {
+    color: rgb(245, 244, 243) !important;
+  }
+
+  /* Task detail and other detail panels */
+  .TaskDetail h2,
+  .TaskDetail h3,
+  .FullWidthPageStructureWithDetailsOverlay h1,
+  .FullWidthPageStructureWithDetailsOverlay h2,
+  .FullWidthPageStructureWithDetailsOverlay h3 {
+    color: rgb(245, 244, 243) !important;
+  }
+
+  /* Section headers in MyTasks and other pages */
+  .MyTasksContent h3,
+  .ProjectDetailContent h3,
+  section h3,
+  [class*="Section"] h3 {
+    color: rgb(245, 244, 243) !important;
+  }
+
+  /* Make sure any heading text is light - comprehensive catch-all */
+  [role="heading"],
+  [aria-level="1"],
+  [aria-level="2"],
+  [aria-level="3"],
+  [aria-level="4"],
+  [aria-level="5"],
+  [aria-level="6"] {
+    color: rgb(245, 244, 243) !important;
+  }
+
+  .SpreadsheetGridScroller-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ProjectDirectoryContent {
+    padding: 12px;
+  }
+
+  /* Search */
+  .ProjectDirectoryTypeahead-input {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  /* Stack spacing adjustments */
+  .Stack--spacing-spacing-24 > * + * {
+    margin-top: 16px;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .SidebarResizableContainer {
+    position: relative;
+    width: 200px;
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    left: 0 !important;
+  }
+
+  .AsanaMain-asanaPageAndTopbar {
+    width: calc(100% - 200px);
+  }
+
+  .LoginCardLayout-card {
+    max-width: 480px;
+  }
+
+  /* Adjust grid layouts */
+  .HomePageContent-widgetsContainer {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 1025px) {
+  .SidebarResizableContainer {
+    width: 240px;
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    left: 0 !important;
+  }
+
+  .AsanaMain-asanaPageAndTopbar {
+    width: calc(100% - 240px);
+  }
+
+  .LoginCardLayout-card {
+    max-width: 520px;
+  }
+
+  /* Enhanced hover states */
+  .ThemeableInteractiveCardPresentation:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+  }
+}
+
+/* Large desktop */
+@media (min-width: 1440px) {
+  .AsanaMain {
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 896px) and (orientation: landscape) {
+  .LoginCardLayout-card {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* Print styles */
+@media print {
+  .SidebarResizableContainer,
+  .GlobalTopbarStructure {
+    background-color: #2E2E30 !important;
+    display: none;
+  }
+
+  .AsanaMain-asanaPageAndTopbar {
+    width: 100%;
+    padding: 0;
+  }
+}
+
+/* Ensure proper layout - Remove all white space from left */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  background-color: #3A3A3C !important;
+  background: #3A3A3C !important;
+}
+
+#asana,
+#asana_full_page,
+#asana_main,
+#asana_sidebar {
+  margin: 0 !important;
+  padding: 0 !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  left: 0 !important;
+  background-color: #3A3A3C !important;
+  background: #3A3A3C !important;
+}
+
+.AppRoot {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0 !important;
+  padding: 0 !important;
+  background-color: #3A3A3C !important;
+  background: #3A3A3C !important;
+}
+
+.AppRoot-fullPage {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  background-color: #3A3A3C !important;
+  background: #3A3A3C !important;
+}
+
+.AsanaMain {
+  flex: 1 1 0;
+  display: flex;
+  overflow: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  min-height: 0;
+}
+
+.AsanaMain-mainLayer {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  gap: 0px;
+  overflow: hidden;
+  overflow-x: visible !important;
+  min-height: 0;
+}
+
+/* Remove any margin/padding from sidebar container */
+.SidebarResizableContainer,
+.AsanaMain-sidebarResizableContainer {
+  margin: 0 !important;
+  padding: 0 !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  left: 0 !important;
+  position: relative;
+}
+
+.SidebarResizableContainer-sidebarWrapper {
+  margin: 0 !important;
+  padding: 0 !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+.Sidebar,
+.SidebarResizableContainer-sidebar {
+  margin: 0 !important;
+  padding: 0 !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  background-color: #2E2E30 !important;
+}
+
+.SidebarResizableContainer,
+.AsanaMain-sidebarResizableContainer {
+  background-color: #2E2E30 !important;
+}
+
+.SidebarResizableContainer-sidebarWrapper {
+  background-color: #2E2E30 !important;
+}
+
+.GlobalTopbar,
+.GlobalTopbarStructure,
+.GlobalTopbarStructure-leftSide,
+.GlobalTopbarStructure-rightSide {
+  background-color: #2E2E30 !important;
+}
+
+.AsanaMain-asanaPageAndTopbar {
+  flex: 1;
+  overflow-y: scroll !important;
+  overflow-x: visible !important;
+  padding: 0 !important;
+  padding-right: 0 !important;
+  padding-right: 0px !important;
+  margin-right: 0 !important;
+  margin-right: 0px !important;
+  right: 0 !important;
+  background: #3A3A3C !important; /* Dark background instead of transparent */
+  background-color: #3A3A3C !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  /* Scrollbar styling - make it overlay content */
+  scrollbar-width: thin; /* Firefox - thin scrollbar */
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent; /* Firefox */
+  -ms-overflow-style: auto; /* IE and Edge */
+  min-height: 0;
+  /* Critical: Allow content to extend fully */
+  clip: unset !important;
+  clip-path: none !important;
+}
+
+/* CRITICAL: Remove ALL padding from main element and its direct children */
+main,
+main#asana_main_page {
+  padding: 0 !important;
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+  margin: 0 !important;
+  margin-right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-x: visible !important;
+  background-color: #3A3A3C !important; /* Dark background instead of transparent */
+  background: #3A3A3C !important;
+  /* Ensure content is not clipped */
+  clip: unset !important;
+  clip-path: none !important;
+}
+
+/* Remove #3E3E40 background from parent containers - let page content handle backgrounds */
+.AsanaMain,
+.AsanaMain-mainLayer {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+.AsanaMain-asanaPageAndTopbar::-webkit-scrollbar {
+  width: 12px;
+  background: transparent;
+  /* Position scrollbar absolutely so it overlays content */
+}
+
+.AsanaMain-asanaPageAndTopbar::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.AsanaMain-asanaPageAndTopbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  border: none;
+  margin-right: 0;
+}
+
+/* MyTasks specific scrollbar positioning */
+.MyTasksContent::-webkit-scrollbar {
+  width: 12px;
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+}
+
+.MyTasksContent::-webkit-scrollbar-track {
+  background: transparent;
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+  border: none;
+}
+
+.MyTasksContent::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  border: none;
+  margin-right: 0 !important;
+}
+
+.MyTasksContent {
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+  padding-right: 0px !important;
+  margin-right: 0px !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Force remove all right padding/margin for MyTasks page */
+#asana_main_page {
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+  padding-right: 0px !important;
+  margin-right: 0px !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+#asana_main_page > div {
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+  padding-right: 0px !important;
+  margin-right: 0px !important;
+  right: 0 !important;
+}
+
+.AsanaMain-mainLayer {
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+  padding-right: 0px !important;
+  margin-right: 0px !important;
+  right: 0 !important;
+}
+
+/* Ensure no right padding on MyTasks page wrapper */
+#asana_main_page .MyTasksContent,
+#asana_main_page > div:first-child,
+.MyTasksPageWrapper,
+.MyTasksPageWrapper > div {
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+  padding-right: 0px !important;
+  margin-right: 0px !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Nuclear option - remove all spacing */
+main#asana_main_page {
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+  padding-right: 0px !important;
+  margin-right: 0px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+main#asana_main_page > div {
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+  padding-right: 0px !important;
+  margin-right: 0px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+main#asana_main_page > div > div {
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+  padding-right: 0px !important;
+  margin-right: 0px !important;
+}
+
+/* Force all content to edge - aggressive override */
+.AsanaMain-asanaPageAndTopbar > * {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Force remove right spacing for scrollable content */
+.MyTasksContent::-webkit-scrollbar {
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+}
+
+.MyTasksContent > *,
+.MyTasksContent > * > * {
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Ensure all nested elements in MyTasks have no right spacing */
+.MyTasksPageWrapper * {
+  box-sizing: border-box;
+}
+
+.MyTasksPageWrapper > div:last-child {
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Remove unwanted padding from all page content containers - but let pages control their own backgrounds */
+.InboxPageContent,
+.SearchPageContent,
+.PortfoliosPageContent,
+.ReportingPageContent,
+.GoalsPageContent,
+.ProfilePageContent,
+.NewProjectPageContent,
+.ProjectDirectoryContent,
+.ProjectDirectoryPageHeader {
+  padding: 0 !important;
+  width: 100%;
+  /* Pages should set their own background colors - don't force transparent */
+}
+
+.HomePageContent {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding-right: 0 !important;
+  padding-right: 0px !important;
+  margin-right: 0 !important;
+  margin-right: 0px !important;
+  margin-right: -20px !important;
+  right: 0 !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  /* Ensure gradient background is applied and not overridden - HIGHEST PRIORITY */
+  background: linear-gradient(to bottom, #424244, #3A3A3C) !important;
+  background-image: linear-gradient(to bottom, #424244, #3A3A3C) !important;
+  background-color: #3A3A3C !important; /* Fallback solid color */
+  min-height: 100vh !important;
+}
+
+/* Remove right padding from Home page containers */
+#asana_main_page .HomePageContent,
+#asana_main_page .HomePageContent > * {
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+  padding-right: 0px !important;
+  margin-right: 0px !important;
+  right: 0 !important;
+}
+
+/* Ensure gradient is applied to HomePageContent in all contexts */
+#asana_main_page .HomePageContent {
+  background: linear-gradient(to bottom, #424244, #3A3A3C) !important;
+  background-image: linear-gradient(to bottom, #424244, #3A3A3C) !important;
+}
+
+/* Force extend to edge - content extends fully, scrollbar overlays */
+main#asana_main_page .HomePageContent,
+main#asana_main_page .MyTasksContent,
+main#asana_main_page .MyTasksPageWrapper {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+  position: relative !important;
+  right: 0 !important;
+  box-sizing: border-box !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  /* Ensure no clipping - content extends under scrollbar */
+  clip: unset !important;
+  clip-path: none !important;
+  overflow-clip-margin: 0 !important;
+  z-index: 1;
+}
+
+/* Ensure HomePageContent gradient shows properly */
+main#asana_main_page .HomePageContent {
+  background: linear-gradient(to bottom, #424244, #3A3A3C) !important;
+  background-image: linear-gradient(to bottom, #424244, #3A3A3C) !important;
+  background-color: #3A3A3C !important; /* Fallback color */
+  min-height: 100vh !important;
+}
+
+/* When sidebar is collapsed */
+.AsanaMain-mainLayer:has(.SidebarResizableContainer.collapsed) main#asana_main_page .HomePageContent,
+.AsanaMain-mainLayer:has(.SidebarResizableContainer.collapsed) main#asana_main_page .MyTasksContent,
+.AsanaMain-mainLayer:has(.SidebarResizableContainer.collapsed) main#asana_main_page .MyTasksPageWrapper {
+  width: 100vw !important;
+}
+
+/* Override for when sidebar is hidden */
+main#asana_main_page {
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Target the direct child of the scrollable container */
+.AsanaMain-asanaPageAndTopbar > .HomePageContent,
+.AsanaMain-asanaPageAndTopbar > .MyTasksPageWrapper {
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Ensure HomePageContent gradient is not overridden */
+.AsanaMain-asanaPageAndTopbar > .HomePageContent {
+  background: linear-gradient(to bottom, #424244, #3A3A3C) !important;
+  background-image: linear-gradient(to bottom, #424244, #3A3A3C) !important;
+  background-color: #3A3A3C !important; /* Fallback color */
+}
+
+/* Task Row Layout Fixes - Prevent Overlapping */
+.SpreadsheetRow {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  width: 100% !important;
+  min-height: 60px !important;
+  padding: 12px 16px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.SpreadsheetRow-stickyCell {
+  width: 100% !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  position: relative !important;
+}
+
+.SpreadsheetPotGridBodyPlaceholder-taskContent {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.SpreadsheetPotGridBody {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.SpreadsheetPotGridBody > div {
+  width: 100% !important;
+}
+
+/* Ensure ProjectDirectoryContent has proper layout without outer padding */
+.ProjectDirectoryContent {
+  width: 100%;
+}
+
+/* Enhanced Animations and Transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Smooth transitions for interactive elements */
+.ButtonThemeablePresentation,
+.ThemeableInteractiveCardPresentation {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ButtonThemeablePresentation:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ButtonThemeablePresentation:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Card hover effects */
+.ThemeableCardPresentation,
+.TaskCard {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ThemeableCardPresentation:hover,
+.TaskCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Modal animations */
+@keyframes modalBackdrop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalContent {
+  from {
+    transform: scale(0.9) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Page transitions */
+.page-enter {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus visible styles for accessibility */
+*:focus-visible {
+  outline: 2px solid #4573d2;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Micro-interactions */
+.TaskRow,
+.TaskCard {
+  transition: all 0.15s ease;
+}
+
+.TaskRow:hover {
+  background-color: #f9fafb;
+}
+
+.SpreadsheetRow-stickyCell {
+  transition: background-color 0.15s ease;
+}
+
+/* Drag and drop feedback */
+.dragging {
+  opacity: 0.5;
+  transform: rotate(5deg);
+}
+
+.drag-over {
+  background-color: #eff6ff;
+  border-color: #4573d2;
+}
+
+/* Form field focus */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #4573d2;
+  box-shadow: 0 0 0 3px rgba(69, 115, 210, 0.1);
+  transition: all 0.2s ease;
+}
+
+/* Smooth view transitions */
+.view-transition {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Responsive animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ========================================
+   COMPREHENSIVE RESPONSIVE DESIGN
+   ======================================== */
+
+/* Base responsive adjustments for all buttons */
+button {
+  transition: all 0.2s ease;
+  min-height: 32px; /* Touch-friendly on mobile */
+}
+
+/* Cards responsive */
+[style*="backgroundColor: '#2A2B2D'"],
+[style*="backgroundColor: '#252628'"],
+.ThemeableCardPresentation,
+.HomeCard-container {
+  transition: all 0.2s ease;
+}
+
+/* Modals responsive */
+.ModalManager {
+  padding: 8px !important;
+}
+
+.ModalManager > div {
+  width: calc(100% - 16px) !important;
+  max-width: 95vw !important;
+  margin: auto !important;
+}
+
+/* Tablet: 768px - 1024px */
+@media (max-width: 1024px) and (min-width: 769px) {
+  /* Cards */
+  [style*="padding: '32px'"] {
+    padding: 24px !important;
+  }
+  
+  /* Grid adjustments */
+  [style*="gridTemplateColumns"] {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  }
+  
+  /* Typography */
+  h1, h2, h3 {
+    font-size: clamp(1.25rem, 2vw, 1.5rem) !important;
+  }
+}
+
+/* Mobile: 320px - 768px */
+@media (max-width: 768px) {
+  /* Layout adjustments */
+  .AsanaMain-asanaPageAndTopbar {
+    padding: 0 !important;
+  }
+  
+  /* Cards - reduced padding */
+  [style*="padding: '32px'"],
+  [style*="padding: '24px'"] {
+    padding: 16px !important;
+  }
+  
+  [style*="padding: '24px 24px 0 24px'"] {
+    padding: 16px 16px 0 16px !important;
+  }
+  
+  /* Buttons - full width on mobile for primary actions */
+  button[style*="var(--accent-primary)"] {
+    width: 100%;
+    margin-bottom: 12px;
+  }
+  
+  /* Grids - single column on mobile */
+  [style*="gridTemplateColumns"] {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  
+  /* Typography scaling */
+  [style*="fontSize: '32px'"] {
+    font-size: 24px !important;
+    line-height: 32px !important;
+  }
+  
+  [style*="fontSize: '20px'"] {
+    font-size: 18px !important;
+    line-height: 24px !important;
+  }
+  
+  [style*="fontSize: '14px'"] {
+    font-size: 13px !important;
+  }
+  
+  [style*="fontSize: '12px'"] {
+    font-size: 11px !important;
+  }
+  
+  /* Spacing reductions */
+  [style*="marginBottom: '48px'"] {
+    margin-bottom: 24px !important;
+  }
+  
+  [style*="marginBottom: '24px'"] {
+    margin-bottom: 16px !important;
+  }
+  
+  [style*="gap: '12px'"] {
+    gap: 8px !important;
+  }
+  
+  /* Flex direction changes */
+  [style*="display: 'flex'"][style*="flexDirection: 'row'"] {
+    flex-wrap: wrap;
+  }
+  
+  /* Header adjustments */
+  [style*="display: 'flex'"][style*="justifyContent: 'space-between'"] {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  
+  /* Modals */
+  .ModalManager {
+    padding: 16px 8px !important;
+  }
+  
+  .ModalManager > div {
+    padding: 16px !important;
+    max-height: 90vh !important;
+  }
+  
+  /* Tables - horizontal scroll on mobile */
+  table,
+  [style*="display: 'grid'"][style*="gridTemplateColumns"] {
+    overflow-x: auto;
+    display: block;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Sidebar already handled above */
+}
+
+/* Small Mobile: 320px - 480px */
+@media (max-width: 480px) {
+  /* Further spacing reductions */
+  [style*="padding: '16px'"] {
+    padding: 12px !important;
+  }
+  
+  /* Smaller font sizes */
+  [style*="fontSize: '18px'"] {
+    font-size: 16px !important;
+  }
+  
+  /* Icons */
+  svg[style*="width: '20px'"] {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  
+  svg[style*="width: '16px'"] {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  
+  /* Buttons */
+  button {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* Large screens: 1920px+ */
+@media (min-width: 1920px) {
+  /* Max content width */
+  .AsanaMain-asanaPageAndTopbar {
+    max-width: 1920px;
+    margin: 0 auto;
+  }
+  
+  /* Card max width */
+  [style*="maxWidth"] {
+    max-width: min(90vw, 1400px) !important;
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  /* Reduced vertical spacing in landscape */
+  [style*="marginBottom: '24px'"] {
+    margin-bottom: 12px !important;
+  }
+  
+  /* Compact modals */
+  .ModalManager > div {
+    max-height: 85vh !important;
+    padding: 12px !important;
+  }
+}
+
+/* Touch-friendly adjustments */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger touch targets */
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Remove hover effects, use active */
+  button:active {
+    transform: scale(0.98);
+    opacity: 0.8;
+  }
+  
+  /* Prevent text selection on buttons */
+  button {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .SidebarResizableContainer,
+  .GlobalTopbar,
+  button,
+  .ModalManager {
+    display: none !important;
+  }
+  
+  .AsanaMain-asanaPageAndTopbar {
+    width: 100% !important;
+    padding: 0 !important;
+  }
+  
+  * {
+    background: white !important;
+    color: black !important;
+  }
+}
