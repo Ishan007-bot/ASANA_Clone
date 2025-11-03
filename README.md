@@ -19,6 +19,7 @@ A high-fidelity Asana clone built with React (TypeScript) frontend and Node.js/E
 - [Environment Variables](#environment-variables)
 - [Development](#development)
 - [RL Environment Readiness](#rl-environment-readiness)
+- [Docker Setup](#docker-setup)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -927,6 +928,215 @@ User Action → Optimistic Update → WebSocket Event → Server Processing → 
 - CDN for static assets
 - Database query optimization and indexing
 - Redis caching for frequently accessed data
+
+---
+
+## 🐳 Docker Setup
+
+### What is Docker?
+
+**Docker** is a containerization platform that packages applications and their dependencies into containers. Think of it like a lightweight virtual machine that runs consistently on any system.
+
+**Benefits:**
+- ✅ **Consistent Environment**: Runs the same way on any machine (Windows, Mac, Linux)
+- ✅ **Easy Setup**: No need to install Node.js, PostgreSQL separately
+- ✅ **Isolated**: Doesn't interfere with your system's existing software
+- ✅ **Portable**: Build once, run anywhere
+- ✅ **Reproducible**: Same image always produces the same result
+
+**Is Docker Required?**
+- **Not strictly required** - You can run the application without Docker (see [Quick Start](#-quick-start))
+- **Highly Recommended** - Makes deployment and sharing much easier
+- **Perfect for Submissions** - Ensures reviewers can run your app without setup hassles
+
+### Docker Setup Instructions
+
+#### Prerequisites
+- **Docker Desktop** installed on your system
+  - Download: https://www.docker.com/products/docker-desktop/
+  - Windows/Mac: Install Docker Desktop
+  - Linux: Install Docker Engine
+
+#### Option 1: Docker Compose (Recommended - Starts Everything)
+
+This starts **frontend, backend, and PostgreSQL database** all at once:
+
+```bash
+# From project root directory
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+
+# Stop and remove volumes (deletes database data)
+docker-compose down -v
+```
+
+**What happens:**
+1. Starts PostgreSQL database container
+2. Starts backend container (connects to PostgreSQL)
+3. Starts frontend container (served via Nginx)
+4. Backend automatically runs database migrations and seeds data
+
+**Access:**
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+- **Database**: localhost:5432 (username: postgres, password: postgres, database: asana_clone)
+
+#### Option 2: Build Individual Images
+
+**Build Backend Image:**
+```bash
+cd asana-backend
+docker build -t asana-backend .
+docker run -p 8000:8000 \
+  -e DATABASE_URL="postgresql://user:pass@host:5432/db" \
+  -e JWT_SECRET="your-secret" \
+  asana-backend
+```
+
+**Build Frontend Image:**
+```bash
+cd asana-frontend
+docker build -t asana-frontend .
+docker run -p 3000:80 asana-frontend
+```
+
+#### Option 3: Use External Database (Supabase)
+
+If you prefer to use Supabase instead of local PostgreSQL:
+
+1. **Update `docker-compose.yml`:**
+   - Remove or comment out the `postgres` service
+   - Update `DATABASE_URL` in `backend` service to your Supabase connection string
+
+2. **Run only frontend and backend:**
+```bash
+docker-compose up frontend backend -d
+```
+
+### Docker Compose Services
+
+**postgres** (PostgreSQL Database)
+- Port: 5432
+- Database: `asana_clone`
+- Username: `postgres`
+- Password: `postgres`
+- Data persists in Docker volume
+
+**backend** (Node.js API)
+- Port: 8000
+- Auto-runs migrations and seeds on startup
+- Connects to PostgreSQL container
+- Restarts automatically on failure
+
+**frontend** (React App)
+- Port: 3000 (maps to container port 80)
+- Built with Nginx for production
+- Serves static files
+- Handles React Router (SPA routing)
+
+### Docker Commands Reference
+
+```bash
+# Start all services in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f              # All services
+docker-compose logs -f backend      # Backend only
+docker-compose logs -f frontend     # Frontend only
+
+# Stop services
+docker-compose stop
+
+# Stop and remove containers
+docker-compose down
+
+# Rebuild images (after code changes)
+docker-compose up -d --build
+
+# Check running containers
+docker ps
+
+# Access container shell
+docker exec -it asana-backend sh
+docker exec -it asana-frontend sh
+
+# View Docker volumes
+docker volume ls
+
+# Remove all volumes (clears database)
+docker-compose down -v
+```
+
+### Environment Variables in Docker
+
+Environment variables can be set in `docker-compose.yml` or via `.env` files:
+
+**docker-compose.yml** (already configured):
+```yaml
+environment:
+  - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/asana_clone
+  - PORT=8000
+```
+
+**Or use .env file:**
+```bash
+# Create .env file in project root
+echo "DATABASE_URL=postgresql://postgres:postgres@postgres:5432/asana_clone" > .env
+```
+
+### Troubleshooting Docker
+
+**Port already in use:**
+```bash
+# Change ports in docker-compose.yml or stop conflicting services
+docker-compose down
+# Update ports in docker-compose.yml
+docker-compose up -d
+```
+
+**Container won't start:**
+```bash
+# Check logs
+docker-compose logs backend
+
+# Rebuild without cache
+docker-compose build --no-cache
+
+# Remove and recreate
+docker-compose down -v
+docker-compose up -d
+```
+
+**Database connection issues:**
+- Ensure PostgreSQL container is healthy: `docker-compose ps`
+- Check database URL matches container service name: `postgres:5432` (not `localhost`)
+- Wait for database to be ready (healthcheck passes)
+
+**Frontend can't connect to backend:**
+- Update `VITE_API_URL` to `http://localhost:8000/api` (or backend container name)
+- Check CORS settings in backend
+- Ensure both containers are on same network (`asana-network`)
+
+### Production Deployment
+
+For production, you would:
+
+1. **Build and push images to registry:**
+```bash
+docker build -t your-registry/asana-backend:latest ./asana-backend
+docker push your-registry/asana-backend:latest
+```
+
+2. **Use production environment variables**
+3. **Set up SSL/TLS certificates**
+4. **Use managed database (RDS, Supabase, etc.)**
+5. **Set up monitoring and logging**
 
 ---
 

@@ -1,0 +1,62 @@
+{
+  "log-in-asana": {
+    "url": "https://app.asana.com/-/login",
+    "filename": "log-in-asana-3.html"
+  },
+  "login": {
+    "url": "https://app.asana.com/-/login",
+    "filename": "login.html"
+  },
+  "login-password": {
+    "url": "https://app.asana.com/-/login",
+    "filename": "login-password.html"
+  },
+  "home-asana": {
+    "url": "https://app.asana.com/1/1211812136908800/home",
+    "filename": "home-asana-3.html"
+  },
+  "my-workspace-inbox-asana": {
+    "url": "https://app.asana.com/1/1211812136908800/inbox/1211812136908821/item/1211812195987976/story/1211812195987979",
+    "filename": "my-workspace-inbox-asana-7.html"
+  },
+  "browse-projects-asana": {
+    "url": "https://app.asana.com/0/projects",
+    "filename": "browse-projects-asana.html"
+  },
+  "search-asana": {
+    "url": "https://app.asana.com/0/search",
+    "filename": "search-asana.html"
+  },
+  "portfolios-asana": {
+    "url": "https://app.asana.com/0/portfolios/1211812136908821",
+    "filename": "portfolios-asana-2.html"
+  },
+  "asana": {
+    "url": "https://app.asana.com/1/1211812136908800/project/1211812136920259/list/1211812136920276",
+    "filename": "asana-5.html"
+  },
+  "new-project-asana": {
+    "url": "https://app.asana.com/1/1211812136908800/create-project",
+    "filename": "new-project-asana.html"
+  },
+  "wfoiwebdfwes-profile-asana": {
+    "url": "https://app.asana.com/0/profile/1211812140583264",
+    "filename": "wfoiwebdfwes-profile-asana.html"
+  },
+  "na-asana": {
+    "url": "https://app.asana.com/1/1211812136908800/project/1211812192165821/list/1211812140498278",
+    "filename": "na-asana.html"
+  },
+  "reporting-asana": {
+    "url": "https://app.asana.com/0/reporting/1211812136908821",
+    "filename": "reporting-asana.html"
+  },
+  "w3fwefivrjs-profile-asana": {
+    "url": "https://app.asana.com/0/profile/1211812140658934",
+    "filename": "w3fwefivrjs-profile-asana.html"
+  },
+  "goals-asana": {
+    "url": "https://app.asana.com/1/1211812136908800/goals/tree/1211812217228478",
+    "filename": "goals-asana.html"
+  }
+}

@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: asana-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: asana_clone
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - asana-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./asana-backend
+      dockerfile: Dockerfile
+    container_name: asana-backend
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/asana_clone?schema=public
+      - PORT=8000
+      - CORS_ORIGIN=http://localhost:3000
+      - JWT_SECRET=docker-jwt-secret-change-in-production
+      - NODE_ENV=production
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./asana-backend:/app
+      - /app/node_modules
+    command: sh -c "npx prisma db push --accept-data-loss && sleep 2 && node index.js"
+    # Note: Seed database after backend starts via API: POST http://localhost:8000/api/seed
+    networks:
+      - asana-network
+    restart: unless-stopped
+
+  # Frontend
+  frontend:
+    build:
+      context: ./asana-frontend
+      dockerfile: Dockerfile
+    container_name: asana-frontend
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+      - VITE_WS_URL=localhost:8000
+      - VITE_USE_API=true
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - asana-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  asana-network:
+    driver: bridge
+
