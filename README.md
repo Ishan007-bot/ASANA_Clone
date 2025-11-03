@@ -7,7 +7,7 @@ A high-fidelity Asana clone built with React (TypeScript) frontend and Node.js/E
 ## 📋 Table of Contents
 
 - [Overview](#overview)
-- [Tech Stack](#tech-stack)
+- [Live Demo](#live-demo)
 - [Project Structure](#project-structure)
 - [Quick Start](#quick-start)
 - [Frontend Setup](#frontend-setup)
@@ -38,6 +38,12 @@ Perfect for:
 - ✅ Reinforcement learning model training
 - ✅ Real-time collaboration
 - ✅ Full CRUD operations
+
+---
+
+## 🔗 Live Demo
+
+Access the deployed app here: [asana-clone-six.vercel.app/login](https://asana-clone-six.vercel.app/login)
 
 ---
 
