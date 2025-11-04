@@ -1,5 +1,6 @@
 // Authentication API Service
 import { api } from './api';
+import { wsService } from './websocket';
 
 export interface LoginCredentials {
   email: string;
@@ -71,9 +72,7 @@ class AuthService {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
     // Disconnect WebSocket
-    if (window.wsService) {
-      window.wsService.disconnect();
-    }
+    wsService.disconnect();
   }
 
   // Refresh token if needed (for future implementation)

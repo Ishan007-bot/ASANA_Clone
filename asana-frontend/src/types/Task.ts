@@ -13,6 +13,7 @@ export interface Task {
   createdAt: string;
   updatedAt: string;
   subtasks?: Task[];
+  position?: number; // Position within section/board
 }
 
 

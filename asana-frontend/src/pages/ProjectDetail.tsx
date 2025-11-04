@@ -9,7 +9,7 @@ import FilterBar from '../components/FilterBar';
 import LoadingSpinner from '../components/LoadingSpinner';
 import type { Task } from '../types/Task';
 import type { TaskFilters } from '../components/FilterBar';
-import { useTasks } from '../context/useTasks';
+import { useTasksApi } from '../context/TaskContextApi';
 import projectsApi, { type Project } from '../services/projectsApi';
 import '../styles/d3ki9tyy5l5ruj_cloudfront_net__root.css';
 
@@ -23,7 +23,7 @@ function ProjectDetail() {
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { tasks, getTasksByProject, joinProjectRoom, leaveProjectRoom } = useTasks();
+  const { tasks, getTasksByProject, joinProjectRoom, leaveProjectRoom } = useTasksApi();
 
   // Load project data from API
   useEffect(() => {
