@@ -6,7 +6,7 @@ import '../styles/d3ki9tyy5l5ruj_cloudfront_net__root.css';
 interface CreateTaskModalProps {
   projectId?: string;
   onClose: () => void;
-  onTaskCreated?: (task: Task) => void;
+  onTaskCreated?: (task: Partial<Task> | Task) => void;
 }
 
 function CreateTaskModal({ projectId, onClose, onTaskCreated }: CreateTaskModalProps) {
@@ -25,7 +25,7 @@ function CreateTaskModal({ projectId, onClose, onTaskCreated }: CreateTaskModalP
     }, 200); // Match animation duration
   };
 
-  const handleSubmit = (task: Task) => {
+  const handleSubmit = (task: Partial<Task>) => {
     onTaskCreated?.(task);
     handleClose();
   };
