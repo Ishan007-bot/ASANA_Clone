@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
+import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -69,7 +70,30 @@ async function createUsers() {
   const users = [];
   const usedEmails = new Set();
 
-  for (let i = 0; i < USERS_TO_CREATE; i++) {
+  // Create a test user first with known credentials
+  const testPasswordHash = await bcrypt.hash('password123', 10);
+  const testUser = await prisma.user.create({
+    data: {
+      email: 'test@example.com',
+      name: 'Test User',
+      avatarUrl: faker.image.avatar(),
+      initials: 'TU',
+      passwordHash: testPasswordHash,
+      theme: 'dark',
+      notificationPreferences: {
+        email: true,
+        push: true,
+        taskAssigned: true,
+        taskCompleted: true,
+      },
+    },
+  });
+  users.push(testUser);
+  usedEmails.add('test@example.com');
+  console.log('  ✅ Created test user: test@example.com / password123');
+
+  // Create remaining users
+  for (let i = 1; i < USERS_TO_CREATE; i++) {
     let email;
     do {
       email = faker.internet.email();
@@ -77,13 +101,16 @@ async function createUsers() {
     usedEmails.add(email);
 
     const name = faker.person.fullName();
+    // Use a common password for all test users, properly hashed
+    const passwordHash = await bcrypt.hash('password123', 10);
+    
     const user = await prisma.user.create({
       data: {
         email,
         name,
         avatarUrl: faker.image.avatar(),
         initials: getInitials(name),
-        passwordHash: faker.internet.password(), // Realistic hash-like string
+        passwordHash: passwordHash,
         theme: faker.helpers.arrayElement(['dark', 'light']),
         notificationPreferences: {
           email: faker.datatype.boolean(),
@@ -100,7 +127,8 @@ async function createUsers() {
     }
   }
 
-  console.log(`✅ Created ${users.length} users`);
+  console.log(`✅ Created ${users.length} users (including test@example.com)`);
+  console.log('   📝 All users have password: password123');
   return users;
 }
 

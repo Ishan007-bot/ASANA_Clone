@@ -2,6 +2,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { useTasks } from '../context/useTasks';
+import projectsApi, { type Project } from '../services/projectsApi';
 import type { Task } from '../types/Task';
 import { format } from 'date-fns';
 import CreateTaskModal from '../components/CreateTaskModal';
@@ -10,6 +11,7 @@ import '../styles/d3ki9tyy5l5ruj_cloudfront_net__root.css';
 
 function Home() {
   const { tasks, toggleTaskCompletion } = useTasks();
+  const [projects, setProjects] = useState<Project[]>([]);
   const [activeTab, setActiveTab] = useState<'upcoming' | 'overdue' | 'completed'>('upcoming');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month'>('week');
@@ -17,6 +19,19 @@ function Home() {
   const [showCustomizeModal, setShowCustomizeModal] = useState(false);
   const periodDropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  // Load projects
+  useEffect(() => {
+    const loadProjects = async () => {
+      try {
+        const fetchedProjects = await projectsApi.getAll();
+        setProjects(fetchedProjects.slice(0, 10)); // Limit to 10 for home page
+      } catch (err) {
+        console.error('Error loading projects:', err);
+      }
+    };
+    loadProjects();
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -40,10 +55,7 @@ function Home() {
   const dateString = format(today, 'EEEE, MMMM d');
   const greeting = `Good ${today.getHours() < 12 ? 'morning' : today.getHours() < 17 ? 'afternoon' : 'evening'}, Ishan`;
 
-  // Mock projects data
-  const projects = [
-    { id: '1', name: 'NA', taskCount: 3, iconColor: 'aqua' },
-  ];
+  // Projects are loaded from API above
 
   // Mock collaborators data with correct colors
   const collaborators = [

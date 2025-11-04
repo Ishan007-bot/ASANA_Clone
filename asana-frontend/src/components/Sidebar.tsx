@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import projectsApi, { type Project } from '../services/projectsApi';
 import CreateProjectModal from './CreateProjectModal';
 import CreatePortfolioModal from './CreatePortfolioModal';
 import '../styles/d3ki9tyy5l5ruj_cloudfront_net__root.css';
@@ -10,11 +11,25 @@ interface SidebarProps {
 
 function Sidebar({ isCollapsed = false }: SidebarProps) {
   const location = useLocation();
+  const [projects, setProjects] = useState<Project[]>([]);
   const [projectsExpanded, setProjectsExpanded] = useState(true);
   const [showCreateMenu, setShowCreateMenu] = useState(false);
   const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
   const [showCreatePortfolioModal, setShowCreatePortfolioModal] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Load projects
+  useEffect(() => {
+    const loadProjects = async () => {
+      try {
+        const fetchedProjects = await projectsApi.getAll();
+        setProjects(fetchedProjects);
+      } catch (err) {
+        console.error('Error loading projects:', err);
+      }
+    };
+    loadProjects();
+  }, []);
 
   const isActive = (path: string) => location.pathname === path;
   
@@ -44,10 +59,6 @@ function Sidebar({ isCollapsed = false }: SidebarProps) {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showCreateMenu]);
-  
-  const projects = [
-    { id: '1', name: 'NA', iconColor: 'aqua' },
-  ];
   
   const portfolios = [
     { id: '1', name: 'My first portfolio' },

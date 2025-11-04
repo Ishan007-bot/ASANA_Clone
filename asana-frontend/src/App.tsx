@@ -3,8 +3,8 @@ import { ToastProvider } from './components/Toast';
 import { ThemeProvider } from './context/ThemeContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 // Use API-based context when backend is available, fallback to local context
-// Default to false for local development unless explicitly enabled
-const USE_API = import.meta.env.VITE_USE_API === 'true';
+// Default to true since backend is running, set VITE_USE_API=false to use local mock data
+const USE_API = import.meta.env.VITE_USE_API !== 'false';
 import { TaskProvider } from './context/TaskContext';
 import { TaskProviderApi } from './context/TaskContextApi';
 import type { ReactNode } from 'react';

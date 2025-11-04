@@ -56,14 +56,15 @@ app.use(express.json());
 // STATISTICAL LATENCY MIDDLEWARE
 // ========================================
 // Adds 1-2 second delay to all GET routes to simulate real-world latency
-app.use((req, res, next) => {
-  if (req.method === 'GET') {
-    const delay = Math.random() * 1000 + 1000; // Random delay between 1000-2000ms
-    setTimeout(() => next(), delay);
-  } else {
-    next();
-  }
-});
+// DISABLED for development - uncomment if you need to simulate latency for RL
+// app.use((req, res, next) => {
+//   if (req.method === 'GET') {
+//     const delay = Math.random() * 1000 + 1000; // Random delay between 1000-2000ms
+//     setTimeout(() => next(), delay);
+//   } else {
+//     next();
+//   }
+// });
 
 // ========================================
 // ROOT ROUTE

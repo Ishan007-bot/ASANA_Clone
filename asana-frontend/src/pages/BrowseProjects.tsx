@@ -1,11 +1,53 @@
+import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { Link } from 'react-router-dom';
+import projectsApi, { type Project } from '../services/projectsApi';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 import '../styles/d3ki9tyy5l5ruj_cloudfront_net__root.css';
 
 function BrowseProjects() {
-  const projects = [
-    { id: 1, name: 'NA', members: ['w3', 'wd', 'wf', 'IG'], team: 'My workspace', status: 'Joined' },
-  ];
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadProjects = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const fetchedProjects = await projectsApi.getAll();
+        setProjects(fetchedProjects);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load projects';
+        setError(errorMessage);
+        console.error('Error loading projects:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProjects();
+  }, []);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+          <LoadingSpinner />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div style={{ padding: '20px', color: 'var(--text-default)' }}>
+          <p>Error loading projects: {error}</p>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -107,57 +149,69 @@ function BrowseProjects() {
           <div className="ProjectDirectory-tableHeaderDivider"></div>
           <div className="Scrollable--withCompositingLayer Scrollable Scrollable--vertical SpreadsheetGridScroller-verticalScroller ProjectDirectory-verticalScroller" data-testid="VerticalScroller" role="presentation" tabIndex={-1}>
             <div className="Scrollable Scrollable--horizontal SpreadsheetGridScroller-horizontalScroller" role="presentation" tabIndex={-1}>
-              {projects.map((project) => (
-                <div key={project.id} className="SpreadsheetRow SpreadsheetRow--enabled ProjectDirectoryProjectRow" role="row">
-                  <div className="SpreadsheetRow-stickyCell" style={{ background: 'transparent', position: 'absolute', left: '0px', width: '400px' }}>
-                    <div className="ProjectDirectoryProjectRow-leftChildren">
-                      <div className="ProjectDirectoryProjectRow-projectIconMaybeWithLock">
-                        <div className="ChipWithIcon--withChipFill ChipWithIcon--colorAqua ChipWithIcon ProjectDirectoryProjectRow-projectIcon">
-                          <svg aria-hidden="true" className="BaseCustomizationIcon BaseCustomizationIcon--16 BaseCustomizationIcon--aqua" focusable="false" viewBox="0 0 24 24">
-                            <path d="M5 5C5 6.3805 3.8805 7.5 2.5 7.5C1.1195 7.5 0 6.3805 0 5C0 3.6195 1.1195 2.5 2.5 2.5C3.8805 2.5 5 3.6195 5 5ZM2.5 9.5C1.1195 9.5 0 10.6195 0 12C0 13.3805 1.1195 14.5 2.5 14.5C3.8805 14.5 5 13.3805 5 12C5 10.6195 3.8805 9.5 2.5 9.5ZM2.5 16.5C1.1195 16.5 0 17.6195 0 19C0 20.3805 1.1195 21.5 2.5 21.5C3.8805 21.5 5 20.3805 5 19C5 17.6195 3.8805 16.5 2.5 16.5ZM9 3V7H24V3H9ZM9 14H24V10H9V14ZM9 21H24V17H9V21Z"></path>
-                          </svg>
-                        </div>
-                      </div>
-                      <div className="ProjectDirectoryProjectRow-name">
-                        <Link className="ProjectDirectoryProjectRow-projectName" to={`/projects/${project.id}`}>
-                          <h6 className="TypographyPresentation TypographyPresentation--colorDefault TypographyPresentation--overflowTruncate TypographyPresentation--h6 TypographyPresentation--fontWeightNormal HighlightSol HighlightSol--buildingBlock HighlightSol--core" style={{ color: 'rgb(245, 244, 243)' }}>{project.name}</h6>
-                        </Link>
-                        <span className="TypographyPresentation TypographyPresentation--colorSuccess TypographyPresentation--small HighlightSol HighlightSol--buildingBlock">{project.status}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="SpreadsheetRow-stickyCellPlaceholder" style={{ width: '400px', minWidth: '400px' }}></div>
-                  <div className="ProjectDirectoryProjectRow-rightChildren">
-                    <div className="ProjectDirectoryProjectRow-facepile">
-                      <ul aria-hidden="true" className="FacepileStructure Facepile">
-                        <li className="FacepileStructure-item">
-                          <div aria-hidden="true" className="EllipsisFacepileAvatar--standardTheme EllipsisFacepileAvatar EllipsisFacepileAvatar--sizeSmall Facepile-ellipsisAvatar Facepile-item" data-testid="ellipsis-avatar">
-                            <svg aria-hidden="true" className="MiniIcon--small MiniIcon MoreMiniIcon HighlightSol HighlightSol--core" data-testid="MoreMiniIcon" focusable="false" viewBox="0 0 24 24">
-                              <path d="M5,12c0,1.4-1.1,2.5-2.5,2.5S0,13.4,0,12s1.1-2.5,2.5-2.5S5,10.6,5,12z M12,9.5c-1.4,0-2.5,1.1-2.5,2.5s1.1,2.5,2.5,2.5s2.5-1.1,2.5-2.5S13.4,9.5,12,9.5z M21.5,9.5c-1.4,0-2.5,1.1-2.5,2.5s1.1,2.5,2.5,2.5S24,13.4,24,12S22.9,9.5,21.5,9.5z"></path>
+              {projects.length === 0 ? (
+                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-tertiary)' }}>
+                  <p>No projects found</p>
+                </div>
+              ) : (
+                projects.map((project) => (
+                  <div key={project.id} className="SpreadsheetRow SpreadsheetRow--enabled ProjectDirectoryProjectRow" role="row">
+                    <div className="SpreadsheetRow-stickyCell" style={{ background: 'transparent', position: 'absolute', left: '0px', width: '400px' }}>
+                      <div className="ProjectDirectoryProjectRow-leftChildren">
+                        <div className="ProjectDirectoryProjectRow-projectIconMaybeWithLock">
+                          <div className="ChipWithIcon--withChipFill ChipWithIcon--colorAqua ChipWithIcon ProjectDirectoryProjectRow-projectIcon">
+                            <svg aria-hidden="true" className="BaseCustomizationIcon BaseCustomizationIcon--16 BaseCustomizationIcon--aqua" focusable="false" viewBox="0 0 24 24">
+                              <path d="M5 5C5 6.3805 3.8805 7.5 2.5 7.5C1.1195 7.5 0 6.3805 0 5C0 3.6195 1.1195 2.5 2.5 2.5C3.8805 2.5 5 3.6195 5 5ZM2.5 9.5C1.1195 9.5 0 10.6195 0 12C0 13.3805 1.1195 14.5 2.5 14.5C3.8805 14.5 5 13.3805 5 12C5 10.6195 3.8805 9.5 2.5 9.5ZM2.5 16.5C1.1195 16.5 0 17.6195 0 19C0 20.3805 1.1195 21.5 2.5 21.5C3.8805 21.5 5 20.3805 5 19C5 17.6195 3.8805 16.5 2.5 16.5ZM9 3V7H24V3H9ZM9 14H24V10H9V14ZM9 21H24V17H9V21Z"></path>
                             </svg>
                           </div>
-                        </li>
-                        {project.members.map((member, idx) => (
-                          <li key={idx} className="FacepileStructure-item">
-                            <span aria-hidden="true" className={`Facepile-avatar Facepile-item Avatar AvatarPhoto AvatarPhoto--default AvatarPhoto--small AvatarPhoto--color${idx % 8} HighlightSol HighlightSol--core`}>
-                              <span className="AvatarPhoto-image"></span>
-                              <span aria-hidden="true" aria-label={member} className="AvatarPhoto-initials">{member}</span>
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
+                        </div>
+                        <div className="ProjectDirectoryProjectRow-name">
+                          <Link className="ProjectDirectoryProjectRow-projectName" to={`/projects/${project.id}`}>
+                            <h6 className="TypographyPresentation TypographyPresentation--colorDefault TypographyPresentation--overflowTruncate TypographyPresentation--h6 TypographyPresentation--fontWeightNormal HighlightSol HighlightSol--buildingBlock HighlightSol--core" style={{ color: 'rgb(245, 244, 243)' }}>{project.name}</h6>
+                          </Link>
+                          <span className="TypographyPresentation TypographyPresentation--colorSuccess TypographyPresentation--small HighlightSol HighlightSol--buildingBlock">Active</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="ProjectDirectoryProjectRow-teamsAndPortfoliosSection" style={{ width: '240px' }}>
-                      <Link className="PillThemeablePresentation PillThemeablePresentation--small PillPresentation PillPresentation--colorNone PillPresentation--interactive ProjectDirectoryProjectRow-pill HighlightSol HighlightSol--core HighlightSol--buildingBlock Stack Stack--align-center Stack--direction-row Stack--display-block Stack--spacing-spacing-4" to="/home">
-                        <svg aria-hidden="true" className="MiniIcon UsersMiniIcon HighlightSol HighlightSol--core" data-testid="UsersMiniIcon" focusable="false" viewBox="0 0 24 24">
-                          <path d="M16 14c3.859 0 7-3.14 7-7s-3.141-7-7-7-7 3.14-7 7 3.141 7 7 7Zm0-12c2.757 0 5 2.243 5 5s-2.243 5-5 5-5-2.243-5-5 2.243-5 5-5Zm8 19v2a1 1 0 1 1-2 0v-2c0-1.654-1.346-3-3-3h-6c-1.654 0-3 1.346-3 3v2a1 1 0 1 1-2 0v-2c0-2.757 2.243-5 5-5h6c2.757 0 5 2.243 5 5ZM1 7c0-3.86 3.141-7 7-7a1 1 0 1 1 0 2C5.243 2 3 4.243 3 7s2.243 5 5 5a1 1 0 1 1 0 2c-3.859 0-7-3.14-7-7Zm6 10a1 1 0 0 1-1 1H5c-1.654 0-3 1.346-3 3v2a1 1 0 1 1-2 0v-2c0-2.757 2.243-5 5-5h1a1 1 0 0 1 1 1Z"></path>
-                        </svg>
-                        <span className="TypographyPresentation TypographyPresentation--overflowTruncate TypographyPresentation--medium HighlightSol HighlightSol--buildingBlock">{project.team}</span>
-                      </Link>
+                    <div className="SpreadsheetRow-stickyCellPlaceholder" style={{ width: '400px', minWidth: '400px' }}></div>
+                    <div className="ProjectDirectoryProjectRow-rightChildren">
+                      <div className="ProjectDirectoryProjectRow-facepile">
+                        <ul aria-hidden="true" className="FacepileStructure Facepile">
+                          {project.members && project.members.length > 0 && (
+                            <>
+                              <li className="FacepileStructure-item">
+                                <div aria-hidden="true" className="EllipsisFacepileAvatar--standardTheme EllipsisFacepileAvatar EllipsisFacepileAvatar--sizeSmall Facepile-ellipsisAvatar Facepile-item" data-testid="ellipsis-avatar">
+                                  <svg aria-hidden="true" className="MiniIcon--small MiniIcon MoreMiniIcon HighlightSol HighlightSol--core" data-testid="MoreMiniIcon" focusable="false" viewBox="0 0 24 24">
+                                    <path d="M5,12c0,1.4-1.1,2.5-2.5,2.5S0,13.4,0,12s1.1-2.5,2.5-2.5S5,10.6,5,12z M12,9.5c-1.4,0-2.5,1.1-2.5,2.5s1.1,2.5,2.5,2.5s2.5-1.1,2.5-2.5S13.4,9.5,12,9.5z M21.5,9.5c-1.4,0-2.5,1.1-2.5,2.5s1.1,2.5,2.5,2.5S24,13.4,24,12S22.9,9.5,21.5,9.5z"></path>
+                                  </svg>
+                                </div>
+                              </li>
+                              {project.members.slice(0, 4).map((member: any, idx: number) => (
+                                <li key={idx} className="FacepileStructure-item">
+                                  <span aria-hidden="true" className={`Facepile-avatar Facepile-item Avatar AvatarPhoto AvatarPhoto--default AvatarPhoto--small AvatarPhoto--color${idx % 8} HighlightSol HighlightSol--core`}>
+                                    <span className="AvatarPhoto-image"></span>
+                                    <span aria-hidden="true" aria-label={member.user?.initials || member.user?.name || 'U'} className="AvatarPhoto-initials">{member.user?.initials || member.user?.name?.charAt(0) || 'U'}</span>
+                                  </span>
+                                </li>
+                              ))}
+                            </>
+                          )}
+                        </ul>
+                      </div>
+                      <div className="ProjectDirectoryProjectRow-teamsAndPortfoliosSection" style={{ width: '240px' }}>
+                        {project.team && (
+                          <Link className="PillThemeablePresentation PillThemeablePresentation--small PillPresentation PillPresentation--colorNone PillPresentation--interactive ProjectDirectoryProjectRow-pill HighlightSol HighlightSol--core HighlightSol--buildingBlock Stack Stack--align-center Stack--direction-row Stack--display-block Stack--spacing-spacing-4" to="/home">
+                            <svg aria-hidden="true" className="MiniIcon UsersMiniIcon HighlightSol HighlightSol--core" data-testid="UsersMiniIcon" focusable="false" viewBox="0 0 24 24">
+                              <path d="M16 14c3.859 0 7-3.14 7-7s-3.141-7-7-7-7 3.14-7 7 3.141 7 7 7Zm0-12c2.757 0 5 2.243 5 5s-2.243 5-5 5-5-2.243-5-5 2.243-5 5-5Zm8 19v2a1 1 0 1 1-2 0v-2c0-1.654-1.346-3-3-3h-6c-1.654 0-3 1.346-3 3v2a1 1 0 1 1-2 0v-2c0-2.757 2.243-5 5-5h6c2.757 0 5 2.243 5 5ZM1 7c0-3.86 3.141-7 7-7a1 1 0 1 1 0 2C5.243 2 3 4.243 3 7s2.243 5 5 5a1 1 0 1 1 0 2c-3.859 0-7-3.14-7-7Zm6 10a1 1 0 0 1-1 1H5c-1.654 0-3 1.346-3 3v2a1 1 0 1 1-2 0v-2c0-2.757 2.243-5 5-5h1a1 1 0 0 1 1 1Z"></path>
+                            </svg>
+                            <span className="TypographyPresentation TypographyPresentation--overflowTruncate TypographyPresentation--medium HighlightSol HighlightSol--buildingBlock">{project.team.name || 'My workspace'}</span>
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
