@@ -29,6 +29,18 @@ router.get('/', authenticateToken, async (req, res) => {
         workspace: {
           select: { id: true, name: true },
         },
+        members: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                initials: true,
+                email: true,
+              },
+            },
+          },
+        },
         _count: {
           select: { tasks: true },
         },

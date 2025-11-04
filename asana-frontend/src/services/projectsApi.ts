@@ -13,6 +13,29 @@ export interface Project {
   sections?: Section[];
   createdAt?: string;
   updatedAt?: string;
+  team?: {
+    id: string;
+    name: string;
+  };
+  workspace?: {
+    id: string;
+    name: string;
+  };
+  members?: Array<{
+    id: string;
+    userId: string;
+    projectId: string;
+    role: string;
+    user?: {
+      id: string;
+      name: string;
+      email: string;
+      initials?: string;
+    };
+  }>;
+  _count?: {
+    tasks: number;
+  };
 }
 
 export interface Section {

@@ -660,7 +660,7 @@ function Home() {
                   </div>
                   <div style={{ flex: 1, padding: '0' }}>
                     <div style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 500, padding: '0', marginBottom: '4px' }}>{project.name}</div>
-                    <div style={{ color: 'var(--text-tertiary)', fontSize: '12px', padding: '0' }}>{project.taskCount} tasks due soon</div>
+                    <div style={{ color: 'var(--text-tertiary)', fontSize: '12px', padding: '0' }}>{project._count?.tasks || 0} tasks</div>
                   </div>
                 </Link>
               ))}
