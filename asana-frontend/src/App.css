@@ -337,11 +337,12 @@ body {
   }
 }
 
-/* Large desktop */
+/* Large desktop - Remove max-width to allow full expansion */
 @media (min-width: 1440px) {
   .AsanaMain {
-    max-width: 1440px;
-    margin: 0 auto;
+    max-width: 100% !important;
+    margin: 0 !important;
+    width: 100% !important;
   }
 }
 
@@ -423,16 +424,21 @@ html, body {
   margin-left: 0 !important;
   padding-left: 0 !important;
   min-height: 0;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 .AsanaMain-mainLayer {
   display: flex;
-  width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
   height: 100%;
   margin: 0 !important;
   padding: 0 !important;
   margin-left: 0 !important;
   padding-left: 0 !important;
+  margin-right: 0 !important;
+  padding-right: 0 !important;
   gap: 0px;
   overflow: hidden;
   overflow-x: visible !important;
@@ -480,7 +486,18 @@ html, body {
 .GlobalTopbarStructure-leftSide,
 .GlobalTopbarStructure-rightSide {
   background-color: #2E2E30 !important;
+  border-top: none !important;
 }
+
+/* Remove any green color from topbar */
+.GlobalTopbar::before,
+.GlobalTopbar::after,
+.GlobalTopbarStructure::before,
+.GlobalTopbarStructure::after {
+  display: none !important;
+  content: none !important;
+}
+
 
 .AsanaMain-asanaPageAndTopbar {
   flex: 1;
@@ -703,11 +720,9 @@ main#asana_main_page > div > div {
 .HomePageContent {
   width: 100% !important;
   max-width: 100% !important;
-  padding-right: 0 !important;
-  padding-right: 0px !important;
+  padding-right: 48px !important; /* Add right spacing for cards */
   margin-right: 0 !important;
   margin-right: 0px !important;
-  margin-right: -20px !important;
   right: 0 !important;
   box-sizing: border-box !important;
   position: relative !important;
@@ -718,12 +733,9 @@ main#asana_main_page > div > div {
   min-height: 100vh !important;
 }
 
-/* Remove right padding from Home page containers */
-#asana_main_page .HomePageContent,
+/* Allow padding-right on Home page containers - removed !important override */
 #asana_main_page .HomePageContent > * {
-  padding-right: 0 !important;
   margin-right: 0 !important;
-  padding-right: 0px !important;
   margin-right: 0px !important;
   right: 0 !important;
 }
@@ -732,6 +744,7 @@ main#asana_main_page > div > div {
 #asana_main_page .HomePageContent {
   background: linear-gradient(to bottom, #424244, #3A3A3C) !important;
   background-image: linear-gradient(to bottom, #424244, #3A3A3C) !important;
+  padding-right: 48px !important; /* Add right spacing for cards */
 }
 
 /* Force extend to edge - content extends fully, scrollbar overlays */
@@ -741,7 +754,7 @@ main#asana_main_page .MyTasksPageWrapper {
   width: 100% !important;
   max-width: 100% !important;
   margin-right: 0 !important;
-  padding-right: 0 !important;
+  /* Allow padding-right to be set via inline styles - removed !important override */
   position: relative !important;
   right: 0 !important;
   box-sizing: border-box !important;
@@ -760,6 +773,7 @@ main#asana_main_page .HomePageContent {
   background-image: linear-gradient(to bottom, #424244, #3A3A3C) !important;
   background-color: #3A3A3C !important; /* Fallback color */
   min-height: 100vh !important;
+  padding-right: 48px !important; /* Add right spacing for cards */
 }
 
 /* When sidebar is collapsed */
@@ -779,7 +793,7 @@ main#asana_main_page {
 .AsanaMain-asanaPageAndTopbar > .HomePageContent,
 .AsanaMain-asanaPageAndTopbar > .MyTasksPageWrapper {
   margin-right: 0 !important;
-  padding-right: 0 !important;
+  /* Allow padding-right to be set via inline styles - removed !important override */
   width: 100% !important;
   max-width: 100% !important;
 }
@@ -789,6 +803,7 @@ main#asana_main_page {
   background: linear-gradient(to bottom, #424244, #3A3A3C) !important;
   background-image: linear-gradient(to bottom, #424244, #3A3A3C) !important;
   background-color: #3A3A3C !important; /* Fallback color */
+  padding-right: 48px !important; /* Add right spacing for cards */
 }
 
 /* Task Row Layout Fixes - Prevent Overlapping */
@@ -1188,12 +1203,19 @@ button {
   }
 }
 
-/* Large screens: 1920px+ */
+/* Large screens: 1920px+ - Remove max-width constraints */
 @media (min-width: 1920px) {
-  /* Max content width */
+  /* Allow full width expansion */
   .AsanaMain-asanaPageAndTopbar {
-    max-width: 1920px;
-    margin: 0 auto;
+    max-width: 100% !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+  
+  .AsanaMain {
+    max-width: 100% !important;
+    margin: 0 !important;
+    width: 100% !important;
   }
   
   /* Card max width */

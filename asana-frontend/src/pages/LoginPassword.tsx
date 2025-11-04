@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/d3ki9tyy5l5ruj_cloudfront_net__login.css';
 
@@ -8,15 +8,36 @@ function LoginPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
+  // Load email from localStorage or location state
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('signupEmail');
+    if (savedEmail) {
+      setEmail(savedEmail);
+    }
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && password) {
-      navigate('/home');
-    }
+    
+    // RL Environment: Skip authentication, just proceed with any email/password
+    const userEmail = email.trim() || 'rl-user@example.com';
+    localStorage.setItem('signupEmail', userEmail);
+    localStorage.setItem('auth_token', 'rl-env-token');
+    localStorage.setItem('auth_user', JSON.stringify({
+      id: 'rl-user-1',
+      email: userEmail,
+      name: userEmail.split('@')[0] || 'RL User',
+      initials: userEmail.charAt(0).toUpperCase(),
+      avatarUrl: null,
+      theme: 'dark',
+    }));
+    
+    // Always go to welcome page for onboarding in RL environment
+    navigate('/welcome', { replace: true });
   };
 
   return (
-    <div id="Login-appRoot">
+    <div id="Login-appRoot" style={{ backgroundColor: '#fff', minHeight: '100vh', width: '100%' }}>
       <div className="LoginCardLayout">
         <div className="LoginStickyLogoBar">
           <nav className="LoginStickyLogoBar-nav">
@@ -50,6 +71,7 @@ function LoginPassword() {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        style={{ color: '#000' }}
                       />
                     </div>
                   </div>
@@ -58,7 +80,7 @@ function LoginPassword() {
                   <div className="FormRowLayout-label">
                     <div className="Stack Stack--direction-row Stack--display-block Stack--justify-space-between HighlightSol HighlightSol--buildingBlock">
                       <label className="LabelPresentation HighlightSol HighlightSol--core" htmlFor="password">Password</label>
-                      <a className="LinkThemeablePresentation LinkSecondaryPresentation LinkSecondaryPresentation--sentimentDefault SecondaryLink HighlightSol HighlightSol--core HighlightSol--buildingBlock" href="#" style={{ fontSize: '14px' }}>
+                      <a className="LinkThemeablePresentation LinkSecondaryPresentation LinkSecondaryPresentation--sentimentDefault SecondaryLink HighlightSol HighlightSol--core HighlightSol--buildingBlock" href="#" style={{ fontSize: '14px' }} onClick={(e) => { e.preventDefault(); }}>
                         Forgot your password?
                       </a>
                     </div>
@@ -75,6 +97,7 @@ function LoginPassword() {
                           type={showPassword ? 'text' : 'password'}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
+                          style={{ color: '#000' }}
                         />
                         <button
                           type="button"
@@ -89,7 +112,8 @@ function LoginPassword() {
                             border: 'none',
                             cursor: 'pointer',
                             padding: '4px 8px',
-                            fontSize: '12px'
+                            fontSize: '12px',
+                            color: '#000'
                           }}
                         >
                           {showPassword ? 'Hide' : 'Show'}
@@ -98,12 +122,12 @@ function LoginPassword() {
                     </div>
                   </div>
                 </div>
-                <div className="ButtonThemeablePresentation--isEnabled ButtonThemeablePresentation ButtonThemeablePresentation--large LoginButton LoginEmailForm-continueButton HighlightSol HighlightSol--buildingBlock Stack Stack--align-center Stack--direction-row Stack--display-inline Stack--justify-center" role="button" tabIndex={0} onClick={handleSubmit} style={{ marginTop: '24px', width: '100%' }}>
+                <div className="ButtonThemeablePresentation--isEnabled ButtonThemeablePresentation ButtonThemeablePresentation--large LoginButton LoginEmailForm-continueButton HighlightSol HighlightSol--buildingBlock Stack Stack--align-center Stack--direction-row Stack--display-inline Stack--justify-center" role="button" tabIndex={0} onClick={handleSubmit} style={{ marginTop: '24px', width: '100%', cursor: 'pointer' }}>
                   Log in with password
                 </div>
               </form>
               <div style={{ marginTop: '24px', textAlign: 'center' }}>
-                <a className="LinkThemeablePresentation LinkSecondaryPresentation LinkSecondaryPresentation--sentimentDefault SecondaryLink HighlightSol HighlightSol--core HighlightSol--buildingBlock" href="/login">
+                <a className="LinkThemeablePresentation LinkSecondaryPresentation LinkSecondaryPresentation--sentimentDefault SecondaryLink HighlightSol HighlightSol--core HighlightSol--buildingBlock" href="/login" onClick={(e) => { e.preventDefault(); navigate('/login'); }}>
                   Go back
                 </a>
               </div>
@@ -136,7 +160,3 @@ function LoginPassword() {
 }
 
 export default LoginPassword;
-
-
-
-

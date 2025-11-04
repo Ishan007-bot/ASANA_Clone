@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
+import sql from './db.js';
 
 // Import modular routes
 import authRoutes from './src/routes/auth.js';
@@ -13,6 +14,7 @@ import projectRoutes from './src/routes/projects.js';
 import taskRoutes from './src/routes/tasks.js';
 import commentRoutes from './src/routes/comments.js';
 import seedRoutes from './src/routes/seed.js';
+import sectionRoutes from './src/routes/sections.js';
 
 dotenv.config();
 
@@ -25,8 +27,26 @@ const io = new Server(server, {
   },
 });
 
+// Database connections
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 8000;
+
+// Test database connection using db.js
+async function testDatabaseConnection() {
+  try {
+    console.log('🔍 Testing database connection via db.js...');
+    const result = await sql`SELECT 1 as test`;
+    console.log('✅ Database connection successful via db.js!');
+    console.log('   Connection test result:', result[0]);
+    return true;
+  } catch (error) {
+    console.error('❌ Database connection failed via db.js:', error.message);
+    return false;
+  }
+}
+
+// Test connection on startup
+testDatabaseConnection();
 
 // Middleware
 app.use(cors());
@@ -52,7 +72,7 @@ app.get('/', (req, res) => {
   res.json({
     message: 'Asana Clone API Server',
     version: '1.0.0',
-    endpoints: {
+      endpoints: {
       health: '/api/health',
       auth: '/api/auth',
       users: '/api/users',
@@ -60,6 +80,7 @@ app.get('/', (req, res) => {
       projects: '/api/projects',
       tasks: '/api/tasks',
       comments: '/api/comments',
+      sections: '/api/sections',
       seed: '/api/seed (POST)',
     },
     websocket: {
@@ -78,6 +99,7 @@ app.use('/api/teams', teamRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/sections', sectionRoutes);
 app.use('/api/seed', seedRoutes);
 
 // Health check

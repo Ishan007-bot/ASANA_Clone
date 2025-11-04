@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTasks } from '../context/useTasks';
 import type { Task } from '../types/Task';
 import type { Comment } from '../types/Comment';
 import TaskForm from './TaskForm';
 import Comments from './Comments';
+import commentsApi from '../services/commentsApi';
+import { useToast } from './Toast';
+import LoadingSpinner from './LoadingSpinner';
 import '../styles/d3ki9tyy5l5ruj_cloudfront_net__root.css';
 
 interface TaskDetailProps {
@@ -12,271 +15,335 @@ interface TaskDetailProps {
 }
 
 function TaskDetail({ task, onClose }: TaskDetailProps) {
-  const { toggleTaskCompletion, deleteTask } = useTasks();
+  const { toggleTaskCompletion, deleteTask, updateTask } = useTasks();
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  
-  // Mock comments state (will be replaced with API later)
-  const [comments, setComments] = useState<Comment[]>([
-    {
-      id: '1',
-      taskId: task.id,
-      userId: 'user1',
-      userName: 'IG',
-      userInitials: 'IG',
-      content: 'This looks great! @w3 can you review the design?',
-      createdAt: new Date(Date.now() - 3600000).toISOString(),
-      reactions: [{ emoji: '👍', count: 2 }],
-    },
-    {
-      id: '2',
-      taskId: task.id,
-      userId: 'user2',
-      userName: 'w3',
-      userInitials: 'W3',
-      content: 'Sure, I\'ll take a look tomorrow.',
-      createdAt: new Date(Date.now() - 1800000).toISOString(),
-      reactions: [{ emoji: '👍', count: 1 }],
-    },
-  ]);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [loadingComments, setLoadingComments] = useState(true);
+  const [currentTask, setCurrentTask] = useState<Task>(task);
+  const { showToast } = useToast();
 
-  const handleAddComment = (content: string, parentCommentId?: string) => {
-    const newComment: Comment = {
-      id: `comment_${Date.now()}`,
-      taskId: task.id,
-      parentCommentId,
-      userId: 'current_user',
-      userName: 'You',
-      userInitials: 'YO',
-      content,
-      createdAt: new Date().toISOString(),
-      reactions: [],
-    };
-    setComments([...comments, newComment]);
-  };
-
-  const handleEditComment = (commentId: string, content: string) => {
-    setComments(comments.map(c => 
-      c.id === commentId ? { ...c, content, updatedAt: new Date().toISOString() } : c
-    ));
-  };
-
-  const handleDeleteComment = (commentId: string) => {
-    setComments(comments.filter(c => c.id !== commentId && c.parentCommentId !== commentId));
-  };
-
-  const handleAddReaction = (commentId: string, emoji: string) => {
-    setComments(comments.map(c => {
-      if (c.id === commentId) {
-        const reactions = c.reactions || [];
-        const existingReaction = reactions.find(r => r.emoji === emoji);
-        if (existingReaction) {
-          return {
-            ...c,
-            reactions: reactions.map(r => 
-              r.emoji === emoji ? { ...r, count: r.count + 1 } : r
-            ),
-          };
-        }
-        return {
-          ...c,
-          reactions: [...reactions, { emoji, count: 1 }],
-        };
+  // Load comments from API
+  useEffect(() => {
+    const loadComments = async () => {
+      try {
+        setLoadingComments(true);
+        const fetchedComments = await commentsApi.getByTask(task.id);
+        setComments(fetchedComments);
+      } catch (err) {
+        console.error('Error loading comments:', err);
+        showToast('Failed to load comments', 'error');
+      } finally {
+        setLoadingComments(false);
       }
-      return c;
-    }));
+    };
+
+    loadComments();
+  }, [task.id, showToast]);
+
+  // Update current task when prop changes
+  useEffect(() => {
+    setCurrentTask(task);
+  }, [task]);
+
+  const handleAddComment = async (content: string, parentCommentId?: string) => {
+    try {
+      const newComment = await commentsApi.create({
+        task_id: task.id,
+        parent_comment_id: parentCommentId,
+        content,
+      });
+      setComments((prev) => [...prev, newComment]);
+      showToast('Comment added', 'success');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to add comment';
+      showToast(errorMessage, 'error');
+      throw err;
+    }
   };
 
-  const handleDelete = () => {
+  const handleEditComment = async (commentId: string, content: string) => {
+    try {
+      const updatedComment = await commentsApi.update(commentId, { content });
+      setComments((prev) =>
+        prev.map((c) => (c.id === commentId ? { ...c, ...updatedComment } : c))
+      );
+      showToast('Comment updated', 'success');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update comment';
+      showToast(errorMessage, 'error');
+      throw err;
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await commentsApi.delete(commentId);
+      setComments((prev) => prev.filter((c) => c.id !== commentId && c.parentCommentId !== commentId));
+      showToast('Comment deleted', 'success');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete comment';
+      showToast(errorMessage, 'error');
+    }
+  };
+
+  const handleAddReaction = async (commentId: string, emoji: string) => {
+    try {
+      await commentsApi.toggleReaction(commentId, emoji);
+      // Update local state - toggle reaction
+      setComments((prev) =>
+        prev.map((c) => {
+          if (c.id === commentId) {
+            const reactions = c.reactions || [];
+            const existingReaction = reactions.find((r) => r.emoji === emoji);
+            if (existingReaction) {
+              // Remove reaction
+              return {
+                ...c,
+                reactions: reactions.filter((r) => r.emoji !== emoji),
+              };
+            } else {
+              // Add reaction
+              return {
+                ...c,
+                reactions: [...reactions, { emoji, count: 1 }],
+              };
+            }
+          }
+          return c;
+        })
+      );
+    } catch (err) {
+      console.error('Error toggling reaction:', err);
+    }
+  };
+
+  const handleDelete = async () => {
     if (showDeleteConfirm) {
-      deleteTask(task.id);
+      await deleteTask(task.id);
       onClose?.();
     } else {
       setShowDeleteConfirm(true);
     }
   };
 
+  const handleSave = async (updatedTask: Partial<Task>) => {
+    try {
+      await updateTask(task.id, updatedTask);
+      setCurrentTask((prev) => ({ ...prev, ...updatedTask }));
+      setIsEditing(false);
+      showToast('Task updated', 'success');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update task';
+      showToast(errorMessage, 'error');
+    }
+  };
+
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(date);
   };
 
-  if (isEditing) {
-    return (
-      <div className="TaskPane TaskPane--editing" style={{ padding: '24px', maxWidth: '600px' }}>
-        <TaskForm
-          initialTask={task}
-          onSubmit={() => setIsEditing(false)}
-          onCancel={() => setIsEditing(false)}
-        />
-      </div>
-    );
-  }
+  const formatTime = (dateString?: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+    }).format(date);
+  };
 
   return (
-    <div className="TaskPane" style={{ padding: '24px', maxWidth: '600px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-            <input
-              type="checkbox"
-              checked={task.completed}
-              onChange={() => toggleTaskCompletion(task.id)}
-              style={{ width: '20px', height: '20px', cursor: 'pointer' }}
-            />
-            <h2
-              className="TypographyPresentation TypographyPresentation--colorDefault TypographyPresentation--h3 TypographyPresentation--fontWeightMedium HighlightSol HighlightSol--buildingBlock"
-              style={{
-                textDecoration: task.completed ? 'line-through' : 'none',
-                opacity: task.completed ? 0.6 : 1,
-                flex: 1,
-                color: 'rgb(245, 244, 243)',
-              }}
-            >
-              {task.name}
-            </h2>
-          </div>
-          
-          {task.description && (
-            <div
-              className="TypographyPresentation TypographyPresentation--colorDefault TypographyPresentation--medium HighlightSol HighlightSol--buildingBlock"
-              style={{ marginBottom: '24px', whiteSpace: 'pre-wrap' }}
-            >
-              {task.description}
-            </div>
-          )}
-        </div>
-        
+    <div className="TaskDetail" style={{ color: 'rgb(245, 244, 243)' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 500 }}>Task Details</h2>
         {onClose && (
           <button
             onClick={onClose}
-            className="IconButtonThemeablePresentation--isEnabled IconButtonThemeablePresentation IconButtonThemeablePresentation--medium SubtleIconButton--standardTheme SubtleIconButton HighlightSol HighlightSol--core HighlightSol--buildingBlock Stack Stack--align-center Stack--direction-row Stack--display-inline Stack--justify-center"
-            style={{ marginLeft: '16px' }}
-            aria-label="Close"
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'rgb(245, 244, 243)',
+              cursor: 'pointer',
+              padding: '4px',
+              fontSize: '20px',
+            }}
           >
-            <svg aria-hidden="true" className="Icon HighlightSol HighlightSol--core" focusable="false" viewBox="0 0 32 32">
-              <path d="M24,10.586l-6.293-6.293a1,1,0,0,0-1.414,0L10,10.586,4.293,4.879A1,1,0,0,0,2.879,6.293L8.586,12,2.293,18.293a1,1,0,1,0,1.414,1.414L10,13.414l6.293,6.293a1,1,0,0,0,1.414,0L24,13.414l6.293,6.293a1,1,0,0,0,1.414-1.414L25.414,12l5.707-5.707a1,1,0,0,0,0-1.414Z"></path>
-            </svg>
+            ×
           </button>
         )}
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
-        {task.dueDate && (
-          <div>
-            <div className="TypographyPresentation TypographyPresentation--colorWeak TypographyPresentation--small HighlightSol HighlightSol--buildingBlock" style={{ marginBottom: '4px' }}>
-              Due date
-            </div>
-            <div className="TypographyPresentation TypographyPresentation--colorDefault TypographyPresentation--medium HighlightSol HighlightSol--buildingBlock">
-              {formatDate(task.dueDate)}
-            </div>
-          </div>
-        )}
-
-        {task.assignee && (
-          <div>
-            <div className="TypographyPresentation TypographyPresentation--colorWeak TypographyPresentation--small HighlightSol HighlightSol--buildingBlock" style={{ marginBottom: '4px' }}>
-              Assignee
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span
-                className="Avatar AvatarPhoto AvatarPhoto--default AvatarPhoto--small AvatarPhoto--color0 HighlightSol HighlightSol--core"
+      {isEditing ? (
+        <TaskForm
+          task={currentTask}
+          onSave={handleSave}
+          onCancel={() => setIsEditing(false)}
+        />
+      ) : (
+        <>
+          {/* Task Info */}
+          <div style={{ marginBottom: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <input
+                type="checkbox"
+                checked={currentTask.completed}
+                onChange={() => toggleTaskCompletion(currentTask.id)}
+                style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+              />
+              <h3
                 style={{
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '50%',
-                  background: '#4573d2',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  margin: 0,
+                  fontSize: '18px',
+                  fontWeight: 500,
+                  textDecoration: currentTask.completed ? 'line-through' : 'none',
+                  opacity: currentTask.completed ? 0.6 : 1,
                 }}
               >
-                <span className="AvatarPhoto-initials" style={{ color: 'white', fontSize: '10px', fontWeight: 'bold' }}>
-                  {task.assignee.substring(0, 2).toUpperCase()}
-                </span>
-              </span>
-              <span className="TypographyPresentation TypographyPresentation--colorDefault TypographyPresentation--medium HighlightSol HighlightSol--buildingBlock">
-                {task.assignee}
-              </span>
+                {currentTask.name}
+              </h3>
             </div>
-          </div>
-        )}
 
-        {task.priority && (
-          <div>
-            <div className="TypographyPresentation TypographyPresentation--colorWeak TypographyPresentation--small HighlightSol HighlightSol--buildingBlock" style={{ marginBottom: '4px' }}>
-              Priority
-            </div>
-            <div className="TypographyPresentation TypographyPresentation--colorDefault TypographyPresentation--medium HighlightSol HighlightSol--buildingBlock" style={{ textTransform: 'capitalize' }}>
-              {task.priority}
-            </div>
-          </div>
-        )}
+            {currentTask.description && (
+              <p style={{ margin: '16px 0', color: 'rgba(245, 244, 243, 0.8)', lineHeight: '1.6' }}>
+                {currentTask.description}
+              </p>
+            )}
 
-        {task.tags && task.tags.length > 0 && (
-          <div>
-            <div className="TypographyPresentation TypographyPresentation--colorWeak TypographyPresentation--small HighlightSol HighlightSol--buildingBlock" style={{ marginBottom: '4px' }}>
-              Tags
+            {/* Task Metadata */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginTop: '16px' }}>
+              {currentTask.dueDate && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <svg style={{ width: '16px', height: '16px' }} viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
+                  </svg>
+                  <span>{formatDate(currentTask.dueDate)}</span>
+                </div>
+              )}
+
+              {currentTask.assignee && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <svg style={{ width: '16px', height: '16px' }} viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                  </svg>
+                  <span>{currentTask.assignee}</span>
+                </div>
+              )}
+
+              {currentTask.priority && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span
+                    style={{
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      fontWeight: 500,
+                      backgroundColor:
+                        currentTask.priority === 'high'
+                          ? '#ef4444'
+                          : currentTask.priority === 'medium'
+                          ? '#f59e0b'
+                          : '#10b981',
+                      color: 'white',
+                    }}
+                  >
+                    {currentTask.priority}
+                  </span>
+                </div>
+              )}
+
+              {currentTask.tags && currentTask.tags.length > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  {currentTask.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      style={{
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        fontSize: '12px',
+                        backgroundColor: '#2A2B2D',
+                        color: 'rgb(245, 244, 243)',
+                      }}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              {task.tags.map((tag, idx) => (
-                <span
-                  key={idx}
-                  className="PillThemeablePresentation PillThemeablePresentation--small PillPresentation PillPresentation--colorNone HighlightSol HighlightSol--core HighlightSol--buildingBlock"
+
+            {/* Actions */}
+            <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+              <button
+                onClick={() => setIsEditing(true)}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: '6px',
+                  border: '1px solid var(--border-primary)',
+                  background: '#2A2B2D',
+                  color: 'rgb(245, 244, 243)',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                }}
+              >
+                Edit
+              </button>
+              <button
+                onClick={handleDelete}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: '6px',
+                  border: '1px solid var(--border-primary)',
+                  background: showDeleteConfirm ? '#ef4444' : '#2A2B2D',
+                  color: 'rgb(245, 244, 243)',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                }}
+              >
+                {showDeleteConfirm ? 'Confirm Delete' : 'Delete'}
+              </button>
+              {showDeleteConfirm && (
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
                   style={{
-                    padding: '4px 8px',
-                    borderRadius: '4px',
-                    backgroundColor: '#252628',
-                    fontSize: '12px',
+                    padding: '6px 12px',
+                    borderRadius: '6px',
+                    border: '1px solid var(--border-primary)',
+                    background: '#2A2B2D',
+                    color: 'rgb(245, 244, 243)',
+                    cursor: 'pointer',
+                    fontSize: '14px',
                   }}
                 >
-                  #{tag}
-                </span>
-              ))}
+                  Cancel
+                </button>
+              )}
             </div>
           </div>
-        )}
-      </div>
 
-      <div style={{ display: 'flex', gap: '12px', paddingTop: '24px', borderTop: '1px solid #e5e7eb' }}>
-        <div
-          className="ButtonThemeablePresentation--isEnabled ButtonThemeablePresentation ButtonThemeablePresentation--large ButtonSecondaryPresentation ButtonSecondaryPresentation--sentimentDefault SecondaryButton HighlightSol HighlightSol--core HighlightSol--buildingBlock Stack Stack--align-center Stack--direction-row Stack--display-inline Stack--justify-center"
-          role="button"
-          tabIndex={0}
-          onClick={() => setIsEditing(true)}
-        >
-          Edit
-        </div>
-        <div
-          className="ButtonThemeablePresentation--isEnabled ButtonThemeablePresentation ButtonThemeablePresentation--large ButtonSecondaryPresentation ButtonSecondaryPresentation--sentimentDefault SecondaryButton HighlightSol HighlightSol--core HighlightSol--buildingBlock Stack Stack--align-center Stack--direction-row Stack--display-inline Stack--justify-center"
-          role="button"
-          tabIndex={0}
-          onClick={handleDelete}
-          style={{ color: showDeleteConfirm ? '#dc2626' : 'inherit' }}
-        >
-          {showDeleteConfirm ? 'Confirm Delete' : 'Delete'}
-        </div>
-      </div>
-
-      {/* Comments Section */}
-      <Comments
-        taskId={task.id}
-        comments={comments}
-        currentUserId="current_user"
-        onAddComment={handleAddComment}
-        onEditComment={handleEditComment}
-        onDeleteComment={handleDeleteComment}
-        onAddReaction={handleAddReaction}
-      />
+          {/* Comments Section */}
+          {loadingComments ? (
+            <LoadingSpinner />
+          ) : (
+            <Comments
+              taskId={task.id}
+              comments={comments}
+              onAddComment={handleAddComment}
+              onEditComment={handleEditComment}
+              onDeleteComment={handleDeleteComment}
+              onAddReaction={handleAddReaction}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 }
 
 export default TaskDetail;
-

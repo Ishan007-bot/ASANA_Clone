@@ -17,6 +17,8 @@ function SetupInvite() {
 
   const handleContinue = (e: React.FormEvent) => {
     e.preventDefault();
+    // Mark onboarding as completed
+    localStorage.setItem('onboarding_completed', 'true');
     navigate('/home');
   };
 

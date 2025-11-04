@@ -24,7 +24,7 @@ const transformTask = (task) => ({
   subtasks: task.subtasks?.map(transformTask) || [],
 });
 
-// Get all tasks with optional filters
+// Get all tasks with optional filters and pagination
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const {
@@ -35,6 +35,8 @@ router.get('/', authenticateToken, async (req, res) => {
       priority,
       due_date_start,
       due_date_end,
+      limit,
+      offset,
     } = req.query;
 
     let where = {};
@@ -57,7 +59,7 @@ router.get('/', authenticateToken, async (req, res) => {
       ];
     }
 
-    const tasks = await prisma.task.findMany({
+    const queryOptions = {
       where,
       include: {
         assignee: {
@@ -85,7 +87,17 @@ router.get('/', authenticateToken, async (req, res) => {
         { position: 'asc' },
         { createdAt: 'desc' },
       ],
-    });
+    };
+
+    // Add pagination if provided
+    if (limit) {
+      queryOptions.take = parseInt(limit, 10);
+    }
+    if (offset) {
+      queryOptions.skip = parseInt(offset, 10);
+    }
+
+    const tasks = await prisma.task.findMany(queryOptions);
 
     res.json(tasks.map(transformTask));
   } catch (error) {

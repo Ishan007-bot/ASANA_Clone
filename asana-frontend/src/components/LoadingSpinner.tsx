@@ -67,5 +67,5 @@ export function LoadingSpinner({ size = 'medium', color = '#4573d2', fullScreen 
   );
 }
 
-
-
+// Default export for compatibility with existing imports
+export default LoadingSpinner;

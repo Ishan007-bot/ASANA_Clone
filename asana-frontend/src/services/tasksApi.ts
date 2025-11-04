@@ -18,9 +18,14 @@ export interface UpdateTaskData extends Partial<CreateTaskData> {
   id: string;
 }
 
+export interface PaginationOptions {
+  limit?: number;
+  offset?: number;
+}
+
 const tasksApi = {
-  // Get all tasks with optional filters
-  async getAll(filters?: TaskFilters): Promise<Task[]> {
+  // Get all tasks with optional filters and pagination
+  async getAll(filters?: TaskFilters & PaginationOptions): Promise<Task[]> {
     const params = new URLSearchParams();
     if (filters) {
       if (filters.projectId) params.append('project_id', filters.projectId);
@@ -32,6 +37,8 @@ const tasksApi = {
       if (filters.priority) params.append('priority', filters.priority);
       if (filters.dueDate?.start) params.append('due_date_start', filters.dueDate.start);
       if (filters.dueDate?.end) params.append('due_date_end', filters.dueDate.end);
+      if (filters.limit) params.append('limit', String(filters.limit));
+      if (filters.offset) params.append('offset', String(filters.offset));
     }
     const query = params.toString();
     return api.get<Task[]>(`/tasks${query ? `?${query}` : ''}`);
@@ -86,6 +93,3 @@ const tasksApi = {
 };
 
 export default tasksApi;
-
-
-

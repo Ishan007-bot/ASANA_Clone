@@ -139,7 +139,7 @@ function Home() {
 
   return (
     <Layout>
-      <div className="HomePageContent" style={{ background: 'linear-gradient(to bottom, #424244, #3A3A3C)', backgroundImage: 'linear-gradient(to bottom, #424244, #3A3A3C)', backgroundColor: '#3A3A3C', paddingTop: '16px', paddingRight: '0px', paddingBottom: '120px', paddingLeft: '48px', marginRight: '0px', right: '0', width: '100%', maxWidth: 'none', boxSizing: 'border-box', overflowX: 'visible', minHeight: '100vh' }}>
+      <div className="HomePageContent" style={{ background: 'linear-gradient(to bottom, #424244, #3A3A3C)', backgroundImage: 'linear-gradient(to bottom, #424244, #3A3A3C)', backgroundColor: '#3A3A3C', paddingTop: '16px', paddingRight: '48px', paddingBottom: '120px', paddingLeft: '48px', marginRight: '0px', right: '0', width: '100%', maxWidth: 'none', boxSizing: 'border-box', overflowX: 'visible', minHeight: '100vh' }}>
         {/* Header Section */}
         <div style={{ marginBottom: '0px' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px', padding: '0', marginTop: '0px' }}>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import CreateTaskModal from './CreateTaskModal';
 import type { Task } from '../types/Task';
 import { useKeyboardShortcuts, COMMON_SHORTCUTS } from '../hooks/useKeyboardShortcuts';
+import { authService } from '../services/authApi';
 import '../styles/d3ki9tyy5l5ruj_cloudfront_net__root.css';
 
 interface GlobalTopbarProps {
@@ -14,7 +15,23 @@ interface GlobalTopbarProps {
 function GlobalTopbar({ onToggleSidebar, sidebarVisible = true, onTaskCreated }: GlobalTopbarProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [user, setUser] = useState(authService.getUser());
   const navigate = useNavigate();
+
+  // Load user on mount
+  useEffect(() => {
+    const currentUser = authService.getUser();
+    if (!currentUser && authService.isAuthenticated()) {
+      // Try to fetch user from API
+      authService.getCurrentUser().then(setUser).catch(() => {
+        // If fetch fails, logout
+        authService.logout();
+        navigate('/login');
+      });
+    } else {
+      setUser(currentUser);
+    }
+  }, [navigate]);
 
   // Keyboard shortcuts
   useKeyboardShortcuts([
@@ -47,6 +64,23 @@ function GlobalTopbar({ onToggleSidebar, sidebarVisible = true, onTaskCreated }:
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, []);
+
+  // Handle search query change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    // Navigate to search page if query is entered
+    if (e.target.value.trim()) {
+      navigate(`/search?q=${encodeURIComponent(e.target.value)}`);
+    }
+  };
+
+  // Get user initials
+  const getUserInitials = () => {
+    if (user) {
+      return user.initials || user.name?.substring(0, 2).toUpperCase() || user.email.substring(0, 2).toUpperCase();
+    }
+    return 'U';
+  };
 
   return (
     <div className="GlobalTopbarStructure--onBrowser GlobalTopbarStructure GlobalTopbar" style={{ marginBottom: '0px', backgroundColor: '#2E2E30' }}>
@@ -112,8 +146,8 @@ function GlobalTopbar({ onToggleSidebar, sidebarVisible = true, onTaskCreated }:
                   type="text"
                   placeholder="Search"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="TopbarSearchInputButton-input"
+                  onChange={handleSearchChange}
+                  className="TopbarSearchInputButton-input GlobalTopbar-searchInput"
                   style={{ background: 'transparent', border: 'none', outline: 'none', color: 'inherit', width: '100%' }}
                 />
               </div>
@@ -149,8 +183,8 @@ function GlobalTopbar({ onToggleSidebar, sidebarVisible = true, onTaskCreated }:
             </svg>
           </div>
           <div className="GlobalTopbarPlaceholder-ownerAvatar">
-            <div className="Avatar AvatarPhoto AvatarPhoto--default AvatarPhoto--small AvatarPhoto--color0 HighlightSol HighlightSol--core" style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span aria-label="User" className="AvatarPhoto-initials" style={{ color: 'var(--text-inverse)', fontSize: '12px' }}>U</span>
+            <div className="Avatar AvatarPhoto AvatarPhoto--default AvatarPhoto--small AvatarPhoto--color0 HighlightSol HighlightSol--core" style={{ width: '32px', height: '32px', borderRadius: '50%', background: user ? '#eab308' : 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span aria-label="User" className="AvatarPhoto-initials" style={{ color: 'var(--text-inverse)', fontSize: '12px' }}>{getUserInitials()}</span>
             </div>
           </div>
         </div>
@@ -169,4 +203,3 @@ function GlobalTopbar({ onToggleSidebar, sidebarVisible = true, onTaskCreated }:
 }
 
 export default GlobalTopbar;
-

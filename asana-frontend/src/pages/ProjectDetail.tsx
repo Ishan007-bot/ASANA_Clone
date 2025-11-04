@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Layout from '../components/Layout';
 import TaskList from '../components/TaskList';
@@ -6,9 +6,11 @@ import BoardView from '../components/BoardView';
 import TimelineView from '../components/TimelineView';
 import TaskDetail from '../components/TaskDetail';
 import FilterBar from '../components/FilterBar';
+import LoadingSpinner from '../components/LoadingSpinner';
 import type { Task } from '../types/Task';
 import type { TaskFilters } from '../components/FilterBar';
 import { useTasks } from '../context/useTasks';
+import projectsApi, { type Project } from '../services/projectsApi';
 import '../styles/d3ki9tyy5l5ruj_cloudfront_net__root.css';
 
 type ViewType = 'list' | 'board' | 'timeline';
@@ -18,7 +20,44 @@ function ProjectDetail() {
   const [viewType, setViewType] = useState<ViewType>('list');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [filters, setFilters] = useState<TaskFilters>({});
-  const { tasks, getTasksByProject } = useTasks();
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { tasks, getTasksByProject, joinProjectRoom, leaveProjectRoom } = useTasks();
+
+  // Load project data from API
+  useEffect(() => {
+    if (!id) return;
+
+    const loadProject = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const projectData = await projectsApi.getById(id);
+        setProject(projectData);
+        
+        // Join project room for real-time updates
+        if (joinProjectRoom) {
+          joinProjectRoom(id);
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load project';
+        setError(errorMessage);
+        console.error('Error loading project:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProject();
+
+    // Cleanup: leave project room when component unmounts
+    return () => {
+      if (id && leaveProjectRoom) {
+        leaveProjectRoom(id);
+      }
+    };
+  }, [id, joinProjectRoom, leaveProjectRoom]);
 
   // Extract available assignees and tags for filter options (project-specific)
   const projectTasks = useMemo(() => {
@@ -41,6 +80,27 @@ function ProjectDetail() {
     return Array.from(tags).sort();
   }, [projectTasks]);
 
+  if (loading) {
+    return (
+      <Layout>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#1E1F21' }}>
+          <LoadingSpinner />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error || !project) {
+    return (
+      <Layout>
+        <div style={{ padding: '24px', backgroundColor: '#1E1F21', minHeight: '100vh', color: '#ef4444' }}>
+          <h2>Error loading project</h2>
+          <p>{error || 'Project not found'}</p>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="ProjectDetailPage" style={{ backgroundColor: '#1E1F21', minHeight: '100vh' }}>
@@ -50,7 +110,7 @@ function ProjectDetail() {
               <div className="PageHeaderThemeablePresentation-titleGroup Stack Stack--align-center Stack--direction-row Stack--display-block Stack--spacing-spacing-4 HighlightSol HighlightSol--buildingBlock">
                 <div className="PageHeaderThemeablePresentation-title">
                   <h1 className="TypographyPresentation TypographyPresentation--colorDefault TypographyPresentation--overflowTruncate TypographyPresentation--h4 TypographyPresentation--fontWeightMedium PageHeaderNonEditableTitle HighlightSol HighlightSol--core HighlightSol--buildingBlock" tabIndex={-1} style={{ color: 'rgb(245, 244, 243)' }}>
-                    Project {id || 'Detail'}
+                    {project.name}
                   </h1>
                 </div>
               </div>
@@ -189,6 +249,7 @@ function ProjectDetail() {
                 ) : viewType === 'board' ? (
                   <BoardView
                     projectId={id}
+                    sections={project.sections}
                     onTaskClick={(task) => setSelectedTask(task)}
                   />
                 ) : (
@@ -237,4 +298,3 @@ function ProjectDetail() {
 }
 
 export default ProjectDetail;
-

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authService } from '../services/authApi';
 import '../styles/d3ki9tyy5l5ruj_cloudfront_net__login.css';
 
 function Login() {
@@ -8,16 +9,48 @@ function Login() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // For demo purposes, navigate to welcome page on any email
-    if (email) {
-      // Store email for welcome page
+    
+    // RL Environment: Skip authentication, just proceed
+    if (email.trim()) {
+      // Store email for potential use
       localStorage.setItem('signupEmail', email);
-      navigate('/welcome');
+      // Set mock auth token for RL environment
+      localStorage.setItem('auth_token', 'rl-env-token');
+      localStorage.setItem('auth_user', JSON.stringify({
+        id: 'rl-user-1',
+        email: email,
+        name: email.split('@')[0] || 'RL User',
+        initials: email.charAt(0).toUpperCase(),
+        avatarUrl: null,
+        theme: 'dark',
+      }));
+      // Always go to welcome page for onboarding in RL environment
+      navigate('/welcome', { replace: true });
+    } else {
+      // Even without email, allow proceed for RL - go to onboarding
+      navigate('/welcome', { replace: true });
     }
   };
 
+  const handleGoogleSignIn = () => {
+    // RL Environment: Skip authentication, just proceed
+    const mockEmail = 'user@gmail.com';
+    localStorage.setItem('signupEmail', mockEmail);
+    localStorage.setItem('auth_token', 'rl-env-token');
+    localStorage.setItem('auth_user', JSON.stringify({
+      id: 'rl-user-1',
+      email: mockEmail,
+      name: 'RL User',
+      initials: 'RU',
+      avatarUrl: null,
+      theme: 'dark',
+    }));
+    // Always go to welcome page for onboarding in RL environment
+    navigate('/welcome', { replace: true });
+  };
+
   return (
-    <div id="Login-appRoot">
+    <div id="Login-appRoot" style={{ backgroundColor: '#fff', minHeight: '100vh', width: '100%' }}>
       <div className="LoginCardLayout">
         <div className="LoginStickyLogoBar">
           <nav className="LoginStickyLogoBar-nav">
@@ -35,7 +68,7 @@ function Login() {
               To get started, please sign in
             </h3>
             <div className="LoginDefaultView-content">
-              <div className="ButtonThemeablePresentation--isEnabled ButtonThemeablePresentation ButtonThemeablePresentation--xlarge ButtonSecondaryPresentation ButtonSecondaryPresentation--sentimentDefault SecondaryButton GoogleSignInButton--sparse GoogleSignInButton LoginDefaultView-ssoButton HighlightSol HighlightSol--core HighlightSol--buildingBlock Stack Stack--align-center Stack--direction-row Stack--display-inline Stack--justify-center" role="button" tabIndex={0} onClick={() => { localStorage.setItem('signupEmail', 'user@gmail.com'); navigate('/welcome'); }}>
+              <div className="ButtonThemeablePresentation--isEnabled ButtonThemeablePresentation ButtonThemeablePresentation--xlarge ButtonSecondaryPresentation ButtonSecondaryPresentation--sentimentDefault SecondaryButton GoogleSignInButton--sparse GoogleSignInButton LoginDefaultView-ssoButton HighlightSol HighlightSol--core HighlightSol--buildingBlock Stack Stack--align-center Stack--direction-row Stack--display-inline Stack--justify-center" role="button" tabIndex={0} onClick={handleGoogleSignIn} style={{ cursor: 'pointer' }}>
                 <svg className="ButtonThemeablePresentation-leftIcon GoogleSignInButton-logo--sparse GoogleSignInButton-logo" viewBox="0 0 18 18">
                   <path d="M17.64,9.20454545 C17.64,8.56636364 17.5827273,7.95272727 17.4763636,7.36363636 L9,7.36363636 L9,10.845 L13.8436364,10.845 C13.635,11.97 13.0009091,12.9231818 12.0477273,13.5613636 L12.0477273,15.8195455 L14.9563636,15.8195455 C16.6581818,14.2527273 17.64,11.9454545 17.64,9.20454545 L17.64,9.20454545 Z" fill="#4285F4"></path>
                   <path d="M9,18 C11.43,18 13.4672727,17.1940909 14.9563636,15.8195455 L12.0477273,13.5613636 C11.2418182,14.1013636 10.2109091,14.4204545 9,14.4204545 C6.65590909,14.4204545 4.67181818,12.8372727 3.96409091,10.71 L0.957272727,10.71 L0.957272727,13.0418182 C2.43818182,15.9831818 5.48181818,18 9,18 L9,18 Z" fill="#34A853"></path>
@@ -66,11 +99,12 @@ function Login() {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        style={{ color: '#000' }}
                       />
                     </div>
                   </div>
                 </div>
-                <div className="ButtonThemeablePresentation--isEnabled ButtonThemeablePresentation ButtonThemeablePresentation--large LoginButton LoginEmailForm-continueButton HighlightSol HighlightSol--buildingBlock Stack Stack--align-center Stack--direction-row Stack--display-inline Stack--justify-center" role="button" tabIndex={0} onClick={handleSubmit}>
+                <div className="ButtonThemeablePresentation--isEnabled ButtonThemeablePresentation ButtonThemeablePresentation--large LoginButton LoginEmailForm-continueButton HighlightSol HighlightSol--buildingBlock Stack Stack--align-center Stack--direction-row Stack--display-inline Stack--justify-center" role="button" tabIndex={0} onClick={handleSubmit} style={{ cursor: 'pointer' }}>
                   Continue
                 </div>
               </form>
@@ -108,4 +142,3 @@ function Login() {
 }
 
 export default Login;
-

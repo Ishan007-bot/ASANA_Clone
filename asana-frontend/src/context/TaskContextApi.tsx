@@ -35,6 +35,8 @@ interface TaskContextType {
   getTasksByProject: (projectId: string) => Task[];
   getTaskById: (id: string) => Task | undefined;
   refreshTasks: () => Promise<void>;
+  joinProjectRoom: (projectId: string) => void;
+  leaveProjectRoom: (projectId: string) => void;
 }
 
 export const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -44,6 +46,7 @@ export function TaskProviderApi({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const previousTasksRef = useRef<Task[]>([]);
+  const currentProjectIdRef = useRef<string | null>(null);
 
   // Load tasks on mount
   const loadTasks = useCallback(async () => {
@@ -79,8 +82,8 @@ export function TaskProviderApi({ children }: { children: ReactNode }) {
       // Continue without real-time updates if WebSocket fails
     });
 
-    // Subscribe to WebSocket events
-    const unsubscribeTaskUpdate = wsService.subscribe('task_updated', (data: { task: Task }) => {
+    // Subscribe to WebSocket events (fixed event names - using colons as backend emits)
+    const unsubscribeTaskUpdate = wsService.subscribe('task:updated', (data: { task: Task }) => {
       setTasks((prev) => {
         const index = prev.findIndex((t) => t.id === data.task.id);
         if (index >= 0) {
@@ -92,43 +95,112 @@ export function TaskProviderApi({ children }: { children: ReactNode }) {
       });
     });
 
-    const unsubscribeTaskCreated = wsService.subscribe('task_created', (data: { task: Task }) => {
-      setTasks((prev) => [...prev, data.task]);
-      showToastSafe(`Task "${data.task.name}" created`, 'success');
+    const unsubscribeTaskCreated = wsService.subscribe('task:created', (data: { task: Task; tempId?: string }) => {
+      setTasks((prev) => {
+        // If tempId provided, replace temp task with real one
+        if (data.tempId) {
+          const tempIndex = prev.findIndex((t) => t.id === data.tempId);
+          if (tempIndex >= 0) {
+            const updated = [...prev];
+            updated[tempIndex] = data.task;
+            return updated;
+          }
+        }
+        // Otherwise, check if task already exists (avoid duplicates)
+        const exists = prev.some((t) => t.id === data.task.id);
+        if (!exists) {
+          return [...prev, data.task];
+        }
+        return prev;
+      });
+      if (!data.tempId) {
+        showToastSafe(`Task "${data.task.name}" created`, 'success');
+      }
     });
 
-    const unsubscribeTaskDeleted = wsService.subscribe('task_deleted', (data: { taskId: string }) => {
+    const unsubscribeTaskDeleted = wsService.subscribe('task:deleted', (data: { taskId: string }) => {
       setTasks((prev) => prev.filter((t) => t.id !== data.taskId));
+    });
+
+    const unsubscribeTaskMoved = wsService.subscribe('task:moved', (data: { taskId: string; newSectionId: string | null; newPosition: number }) => {
+      setTasks((prev) => {
+        const index = prev.findIndex((t) => t.id === data.taskId);
+        if (index >= 0) {
+          const updated = [...prev];
+          updated[index] = {
+            ...updated[index],
+            sectionId: data.newSectionId || undefined,
+            position: data.newPosition,
+          };
+          return updated;
+        }
+        return prev;
+      });
     });
 
     return () => {
       unsubscribeTaskUpdate();
       unsubscribeTaskCreated();
       unsubscribeTaskDeleted();
-      wsService.disconnect();
+      unsubscribeTaskMoved();
+      // Don't disconnect WebSocket here as it might be used by other components
     };
   }, [loadTasks]);
+
+  const joinProjectRoom = useCallback((projectId: string) => {
+    if (currentProjectIdRef.current && currentProjectIdRef.current !== projectId) {
+      // Leave previous project room
+      wsService.leaveProject(currentProjectIdRef.current);
+    }
+    currentProjectIdRef.current = projectId;
+    wsService.joinProject(projectId);
+  }, []);
+
+  const leaveProjectRoom = useCallback((projectId: string) => {
+    wsService.leaveProject(projectId);
+    if (currentProjectIdRef.current === projectId) {
+      currentProjectIdRef.current = null;
+    }
+  }, []);
 
   const createTask = useCallback(
     async (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>): Promise<Task> => {
       try {
         // Optimistic update
+        const tempId = `temp_${Date.now()}`;
         const optimisticTask: Task = {
           ...taskData,
-          id: `temp_${Date.now()}`,
+          id: tempId,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           completed: taskData.completed ?? false,
         };
         setTasks((prev) => [...prev, optimisticTask]);
 
-        const newTask = await tasksApi.create(taskData as CreateTaskData);
-
-        // Replace optimistic task with real one
-        setTasks((prev) => prev.map((t) => (t.id === optimisticTask.id ? newTask : t)));
-
-        showToastSafe(`Task "${newTask.name}" created`, 'success');
-        return newTask;
+        // Try WebSocket first, fallback to REST API
+        if (wsService.isConnected() && taskData.projectId) {
+          // Send via WebSocket for real-time updates
+          wsService.createTaskViaSocket(tempId, {
+            name: taskData.name,
+            description: taskData.description,
+            project_id: taskData.projectId,
+            section_id: taskData.sectionId,
+            due_date: taskData.dueDate,
+            assignee_id: taskData.assignee,
+            priority: taskData.priority || 'medium',
+            tags: taskData.tags || [],
+            completed: taskData.completed || false,
+          });
+          // WebSocket will handle the response and update the task
+          return optimisticTask;
+        } else {
+          // Fallback to REST API
+          const newTask = await tasksApi.create(taskData as CreateTaskData);
+          // Replace optimistic task with real one
+          setTasks((prev) => prev.map((t) => (t.id === tempId ? newTask : t)));
+          showToastSafe(`Task "${newTask.name}" created`, 'success');
+          return newTask;
+        }
       } catch (err) {
         // Rollback optimistic update
         setTasks((prev) => prev.filter((t) => !t.id.startsWith('temp_')));
@@ -157,20 +229,36 @@ export function TaskProviderApi({ children }: { children: ReactNode }) {
           return prev;
         });
 
-        const updatedTask = await tasksApi.update(id, updates as CreateTaskData);
-
-        // Replace with server response
-        setTasks((prev) => {
-          const index = prev.findIndex((t) => t.id === id);
-          if (index >= 0) {
-            const updated = [...prev];
-            updated[index] = updatedTask;
-            return updated;
-          }
-          return prev;
-        });
-
-        return updatedTask;
+        // Try WebSocket first, fallback to REST API
+        if (wsService.isConnected()) {
+          wsService.updateTaskViaSocket(id, {
+            name: updates.name,
+            description: updates.description,
+            project_id: updates.projectId,
+            section_id: updates.sectionId,
+            due_date: updates.dueDate,
+            assignee_id: updates.assignee,
+            priority: updates.priority,
+            tags: updates.tags,
+            completed: updates.completed,
+          });
+          // WebSocket will handle the response
+          return tasks.find((t) => t.id === id) || null;
+        } else {
+          // Fallback to REST API
+          const updatedTask = await tasksApi.update(id, updates as CreateTaskData);
+          // Replace with server response
+          setTasks((prev) => {
+            const index = prev.findIndex((t) => t.id === id);
+            if (index >= 0) {
+              const updated = [...prev];
+              updated[index] = updatedTask;
+              return updated;
+            }
+            return prev;
+          });
+          return updatedTask;
+        }
       } catch (err) {
         // Rollback
         const errorMessage = err instanceof Error ? err.message : 'Failed to update task';
@@ -190,7 +278,14 @@ export function TaskProviderApi({ children }: { children: ReactNode }) {
         // Optimistic update
         setTasks((prev) => prev.filter((t) => t.id !== id));
 
-        await tasksApi.delete(id);
+        // Try WebSocket first, fallback to REST API
+        if (wsService.isConnected()) {
+          wsService.deleteTaskViaSocket(id);
+          // WebSocket will handle the response
+        } else {
+          await tasksApi.delete(id);
+        }
+        
         showToastSafe(`Task "${task?.name || 'Task'}" deleted`, 'success');
         return true;
       } catch (err) {
@@ -259,6 +354,8 @@ export function TaskProviderApi({ children }: { children: ReactNode }) {
         getTasksByProject,
         getTaskById,
         refreshTasks: loadTasks,
+        joinProjectRoom,
+        leaveProjectRoom,
       }}
     >
       {children}

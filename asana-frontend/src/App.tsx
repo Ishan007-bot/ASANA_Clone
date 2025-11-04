@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastProvider } from './components/Toast';
 import { ThemeProvider } from './context/ThemeContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
 // Use API-based context when backend is available, fallback to local context
 // Default to false for local development unless explicitly enabled
 const USE_API = import.meta.env.VITE_USE_API === 'true';
@@ -45,27 +46,32 @@ function App() {
         <TaskProviderWrapper>
           <BrowserRouter>
             <Routes>
+              {/* Public routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/login-password" element={<LoginPassword />} />
               <Route path="/welcome" element={<Welcome />} />
               <Route path="/tell-us-about-work" element={<TellUsAboutWork />} />
               <Route path="/what-tools-do-you-use" element={<WhatToolsDoYouUse />} />
-              <Route path="/setup-first-project" element={<SetupFirstProject />} />
-              <Route path="/setup-tasks" element={<SetupTasks />} />
-              <Route path="/setup-sections" element={<SetupSections />} />
-              <Route path="/setup-layout" element={<SetupLayout />} />
-              <Route path="/setup-invite" element={<SetupInvite />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="/my-tasks" element={<MyTasks />} />
-              <Route path="/projects" element={<BrowseProjects />} />
-              <Route path="/inbox" element={<Inbox />} />
-              <Route path="/reporting" element={<Reporting />} />
-              <Route path="/portfolios" element={<Portfolios />} />
-              <Route path="/goals" element={<Goals />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/new-project" element={<NewProject />} />
-              <Route path="/projects/:id" element={<ProjectDetail />} />
+              
+              {/* Protected routes */}
+              <Route path="/setup-first-project" element={<ProtectedRoute><SetupFirstProject /></ProtectedRoute>} />
+              <Route path="/setup-tasks" element={<ProtectedRoute><SetupTasks /></ProtectedRoute>} />
+              <Route path="/setup-sections" element={<ProtectedRoute><SetupSections /></ProtectedRoute>} />
+              <Route path="/setup-layout" element={<ProtectedRoute><SetupLayout /></ProtectedRoute>} />
+              <Route path="/setup-invite" element={<ProtectedRoute><SetupInvite /></ProtectedRoute>} />
+              <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+              <Route path="/my-tasks" element={<ProtectedRoute><MyTasks /></ProtectedRoute>} />
+              <Route path="/projects" element={<ProtectedRoute><BrowseProjects /></ProtectedRoute>} />
+              <Route path="/projects/:id" element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
+              <Route path="/inbox" element={<ProtectedRoute><Inbox /></ProtectedRoute>} />
+              <Route path="/reporting" element={<ProtectedRoute><Reporting /></ProtectedRoute>} />
+              <Route path="/portfolios" element={<ProtectedRoute><Portfolios /></ProtectedRoute>} />
+              <Route path="/goals" element={<ProtectedRoute><Goals /></ProtectedRoute>} />
+              <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/new-project" element={<ProtectedRoute><NewProject /></ProtectedRoute>} />
+              
+              {/* Default redirect */}
               <Route path="/" element={<Navigate to="/login" replace />} />
             </Routes>
           </BrowserRouter>
@@ -76,4 +82,3 @@ function App() {
 }
 
 export default App;
-
