@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Layout from '../components/Layout';
 import type { Task } from '../types/Task';
 import { useTasks } from '../context/useTasks';
@@ -35,6 +35,18 @@ function MyTasks() {
   const [showCustomizeModal, setShowCustomizeModal] = useState(false);
   const [showOptionsModal, setShowOptionsModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
+
+  // Initialize default visible counts per section (5 each) without overwriting existing
+  useEffect(() => {
+    setVisibleCounts((prev) => {
+      const next: Record<string, number> = { ...prev };
+      for (const s of sections) {
+        if (next[s.id] === undefined) next[s.id] = 5;
+      }
+      return next;
+    });
+  }, [sections]);
 
   // Filter tasks into sections
   const getTasksForSection = (sectionId: string): Task[] => {
@@ -336,6 +348,10 @@ function MyTasks() {
           {/* Sections */}
           {viewType === 'list' && sections.map((section) => {
             const sectionTasks = getTasksForSection(section.id);
+            const visibleTasks = sectionTasks.slice(0, 5); // Show first 5 tasks
+            const remainingTasks = sectionTasks.slice(5); // Get remaining tasks
+            const showLoadMore = remainingTasks.length > 0;
+
             return (
               <div key={section.id} style={{ marginBottom: '40px' }}>
                 {/* Section Header */}
@@ -379,6 +395,13 @@ function MyTasks() {
                     margin: 0,
                     flex: 1,
                   }}>{section.name}</h3>
+                  <span style={{
+                    fontSize: '12px',
+                    color: 'var(--text-tertiary)',
+                    marginLeft: '8px',
+                  }}>
+                    {visibleTasks.length} / {sectionTasks.length}
+                  </span>
                 </div>
 
                 {/* Section Tasks Table */}
@@ -405,7 +428,7 @@ function MyTasks() {
                     {/* Task Rows */}
                     {sectionTasks.length > 0 ? (
                       <div>
-                        {sectionTasks.map((task) => (
+                        {sectionTasks.slice(0, visibleCounts[section.id] ?? 5).map((task) => (
                           <div
                             key={task.id}
                             style={{
@@ -479,6 +502,25 @@ function MyTasks() {
                             )}
                           </div>
                         ))}
+                        {(visibleCounts[section.id] ?? 5) < sectionTasks.length && (
+                          <div style={{ paddingTop: '8px' }}>
+                            <button
+                              type="button"
+                              onClick={() => setVisibleCounts((prev) => ({ ...prev, [section.id]: (prev[section.id] ?? 5) + 5 }))}
+                              style={{
+                                padding: '8px 12px',
+                                borderRadius: '6px',
+                                border: '1px solid var(--border-primary)',
+                                background: '#2A2B2D',
+                                color: 'rgb(245, 244, 243)',
+                                fontSize: '14px',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              More
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ) : null}
                     
@@ -489,7 +531,7 @@ function MyTasks() {
                       gap: section.id === 'recently-assigned' ? '16px' : '0',
                       padding: '8px 0',
                       paddingLeft: section.id === 'recently-assigned' ? '30px' : '30px',
-                      borderBottom: sectionTasks.length > 0 ? '1px solid var(--border-primary)' : 'none',
+                      borderBottom: visibleTasks.length > 0 ? '1px solid var(--border-primary)' : 'none',
                     }}>
                       <input
                         type="text"
@@ -505,6 +547,8 @@ function MyTasks() {
                         }}
                       />
                     </div>
+
+                    
                   </div>
                 )}
               </div>

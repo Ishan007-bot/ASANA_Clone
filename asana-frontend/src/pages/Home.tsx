@@ -19,6 +19,7 @@ function Home() {
   const [showCustomizeModal, setShowCustomizeModal] = useState(false);
   const periodDropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const [visibleTaskCount, setVisibleTaskCount] = useState(5);
 
   // Load projects
   useEffect(() => {
@@ -93,6 +94,11 @@ function Home() {
         return [];
     }
   }, [tasks, activeTab]);
+
+  // Reset visible count on tab change
+  useEffect(() => {
+    setVisibleTaskCount(5);
+  }, [activeTab]);
 
   const overdueCount = useMemo(() => {
     const today = new Date();
@@ -489,7 +495,7 @@ function Home() {
                 No {activeTab} tasks
               </div>
             ) : (
-              filteredTasks.map((task) => (
+              filteredTasks.slice(0, visibleTaskCount).map((task) => (
                 <div
                   key={task.id}
                   style={{
@@ -551,6 +557,25 @@ function Home() {
                   </div>
                 </div>
               ))
+            )}
+            {filteredTasks.length > visibleTaskCount && (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0' }}>
+                <button
+                  type="button"
+                  onClick={() => setVisibleTaskCount((c) => c + 5)}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    border: '1px solid var(--border-primary)',
+                    background: '#2A2B2D',
+                    color: 'rgb(245, 244, 243)',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  More
+                </button>
+              </div>
             )}
           </div>
         </div>
