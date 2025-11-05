@@ -5,6 +5,11 @@ import type { Task } from '../types/Task';
 import { useKeyboardShortcuts, COMMON_SHORTCUTS } from '../hooks/useKeyboardShortcuts';
 import { authService } from '../services/authApi';
 import '../styles/d3ki9tyy5l5ruj_cloudfront_net__root.css';
+import HelpModal from './HelpModal';
+import CreateWorkspaceModal from './CreateWorkspaceModal';
+import InviteToAsanaModal from './InviteToAsanaModal';
+import SettingsModal from './SettingsModal';
+import { useRef } from 'react';
 
 interface GlobalTopbarProps {
   onToggleSidebar?: () => void;
@@ -17,6 +22,12 @@ function GlobalTopbar({ onToggleSidebar, sidebarVisible = true, onTaskCreated }:
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [user, setUser] = useState(authService.getUser());
   const navigate = useNavigate();
+  const [showHelp, setShowHelp] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const [showCreateWorkspace, setShowCreateWorkspace] = useState(false);
+  const [showInvite, setShowInvite] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Load user on mount
   useEffect(() => {
@@ -32,6 +43,17 @@ function GlobalTopbar({ onToggleSidebar, sidebarVisible = true, onTaskCreated }:
       setUser(currentUser);
     }
   }, [navigate]);
+
+  // Close user menu on outside click
+  useEffect(() => {
+    const onDocClick = (e: MouseEvent) => {
+      if (showUserMenu && userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, [showUserMenu]);
 
   // Keyboard shortcuts
   useKeyboardShortcuts([
@@ -171,6 +193,7 @@ function GlobalTopbar({ onToggleSidebar, sidebarVisible = true, onTaskCreated }:
             className="IconButtonThemeablePresentation--isEnabled IconButtonThemeablePresentation IconButtonThemeablePresentation--medium LearningHubTopbarButton HighlightSol HighlightSol--buildingBlock Stack Stack--align-center Stack--direction-row Stack--display-inline Stack--justify-center"
             role="button"
             tabIndex={0}
+            onClick={() => setShowHelp(true)}
           >
             <svg
               aria-hidden="true"
@@ -183,8 +206,79 @@ function GlobalTopbar({ onToggleSidebar, sidebarVisible = true, onTaskCreated }:
             </svg>
           </div>
           <div className="GlobalTopbarPlaceholder-ownerAvatar">
-            <div className="Avatar AvatarPhoto AvatarPhoto--default AvatarPhoto--small AvatarPhoto--color0 HighlightSol HighlightSol--core" style={{ width: '32px', height: '32px', borderRadius: '50%', background: user ? '#eab308' : 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span aria-label="User" className="AvatarPhoto-initials" style={{ color: 'var(--text-inverse)', fontSize: '12px' }}>{getUserInitials()}</span>
+            <div ref={userMenuRef} style={{ position: 'relative' }}>
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => setShowUserMenu((v) => !v)}
+                className="Avatar AvatarPhoto AvatarPhoto--default AvatarPhoto--small AvatarPhoto--color0 HighlightSol HighlightSol--core"
+                style={{ width: '32px', height: '32px', borderRadius: '50%', background: user ? '#eab308' : 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+              >
+                <span aria-label="User" className="AvatarPhoto-initials" style={{ color: 'var(--text-inverse)', fontSize: '12px' }}>{getUserInitials()}</span>
+              </div>
+              {showUserMenu && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: 0,
+                    top: '40px',
+                    width: '280px',
+                    background: '#1E1F21',
+                    border: '1px solid var(--border-primary)',
+                    borderRadius: '8px',
+                    boxShadow: '0 10px 24px rgba(0,0,0,0.4)',
+                    zIndex: 2000,
+                    overflow: 'hidden',
+                  }}
+                >
+                  {/* Header */}
+                  <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border-primary)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div className="Avatar AvatarPhoto AvatarPhoto--default AvatarPhoto--small" style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#eab308', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span className="AvatarPhoto-initials" style={{ color: 'var(--text-inverse)', fontSize: '12px' }}>{getUserInitials()}</span>
+                    </div>
+                    <div>
+                      <div style={{ color: 'rgb(245, 244, 243)', fontWeight: 600, fontSize: '14px' }}>My workspace</div>
+                      <div style={{ color: 'var(--text-tertiary)', fontSize: '12px' }}>{user?.email || 'user@example.com'}</div>
+                    </div>
+                  </div>
+
+                  {/* Items */}
+                  {[
+                    { label: 'Admin console', action: () => window.open('https://app.asana.com/admin/1211818969602074/members', '_blank') },
+                    { label: 'New workspace', action: () => setShowCreateWorkspace(true) },
+                    { label: 'Invite to Asana', action: () => setShowInvite(true) },
+                    { divider: true },
+                    { label: 'Profile', action: () => navigate('/home') },
+                    { label: 'Settings', action: () => setShowSettings(true) },
+                    { label: 'Add another account', action: () => window.open('/login', '_blank') },
+                    { divider: true },
+                    { label: 'Log out', action: () => { authService.logout(); navigate('/login'); } },
+                  ].map((item, idx) => (
+                    item.divider ? (
+                      <div key={`d_${idx}`} style={{ height: '1px', background: 'var(--border-primary)' }} />
+                    ) : (
+                      <button
+                        key={item.label}
+                        onClick={() => { setShowUserMenu(false); item.action(); }}
+                        style={{
+                          width: '100%',
+                          padding: '10px 16px',
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'rgb(245, 244, 243)',
+                          textAlign: 'left',
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#252628')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                      >
+                        {item.label}
+                      </button>
+                    )
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -198,6 +292,10 @@ function GlobalTopbar({ onToggleSidebar, sidebarVisible = true, onTaskCreated }:
           }}
         />
       )}
+      <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
+      <CreateWorkspaceModal isOpen={showCreateWorkspace} onClose={() => setShowCreateWorkspace(false)} />
+      <InviteToAsanaModal isOpen={showInvite} onClose={() => setShowInvite(false)} />
+      <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
     </div>
   );
 }
