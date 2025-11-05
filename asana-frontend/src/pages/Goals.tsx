@@ -23,6 +23,11 @@ function Goals() {
   const [showCreateGoalModal, setShowCreateGoalModal] = useState(false);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
+  type Subgoal = { id: string; title: string; timePeriod: string; team: string };
+  const [subgoals, setSubgoals] = useState<Subgoal[]>([
+    { id: '1', title: '', timePeriod: 'Q4 FY25', team: 'sst.scaler.com' },
+    { id: '2', title: '', timePeriod: 'Q4 FY25', team: 'sst.scaler.com' },
+  ]);
 
   useEffect(() => {
     const loadGoals = async () => {
