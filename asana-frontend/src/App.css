@@ -1016,7 +1016,7 @@ select:focus {
   transition: all 0.2s ease;
 }
 
-/* Make all input, textarea, and select text black */
+/* Global input text color for dark theme */
 input,
 textarea,
 select,
@@ -1029,8 +1029,6 @@ input[type="date"],
 input[type="time"],
 input[type="url"],
 input[type="tel"],
-textarea,
-select,
 .TextInput,
 .TextInputBase,
 .SizedTextInput,
@@ -1042,8 +1040,7 @@ select,
 .FormRowLayout input,
 .FormRowLayout textarea,
 .FormRowLayout select {
-  color: #000000 !important;
-  color: rgb(0, 0, 0) !important;
+  color: rgb(245, 244, 243) !important;
 }
 
 /* Smooth view transitions */
@@ -1306,4 +1303,38 @@ button {
   }
   
   /* Removed forced white background - using dark theme instead */
+}
+
+/* Force input text to white on dark-themed fields */
+input,
+textarea,
+select,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="url"],
+input[type="tel"],
+.TextInput,
+.TextInputBase,
+.SizedTextInput,
+.SearchTextInput,
+.ProjectDirectoryTypeahead-input,
+.ValidatedInput input,
+.ValidatedInput textarea,
+.ValidatedInput select,
+.FormRowLayout input,
+.FormRowLayout textarea,
+.FormRowLayout select {
+  color: rgb(245, 244, 243) !important;
+  caret-color: rgb(245, 244, 243);
+}
+
+/* Placeholder color on dark */
+input::placeholder,
+textarea::placeholder {
+  color: rgba(245, 244, 243, 0.6) !important;
 }
