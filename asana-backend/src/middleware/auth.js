@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -10,15 +11,61 @@ export const authenticateToken = async (req, res, next) => {
 
     // RL Environment: Accept mock token for development/testing
     if (token === 'rl-env-token') {
-      // Create a mock user for RL environment
-      req.user = {
-        id: 'rl-user-1',
-        email: 'rl-user@example.com',
-        name: 'RL User',
-        initials: 'RU',
-        avatarUrl: null,
-        theme: 'dark',
-      };
+      // Use a real user from database for RL environment (preferably test user)
+      let user = await prisma.user.findFirst({
+        where: {
+          email: 'test@example.com',
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          initials: true,
+          avatarUrl: true,
+          theme: true,
+        },
+      });
+
+      // If no test user exists, get the first user from the database
+      if (!user) {
+        user = await prisma.user.findFirst({
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            initials: true,
+            avatarUrl: true,
+            theme: true,
+          },
+          orderBy: {
+            createdAt: 'asc',
+          },
+        });
+      }
+
+      // If still no user, create a default RL user
+      if (!user) {
+        const passwordHash = await bcrypt.hash('password', 10);
+        user = await prisma.user.create({
+          data: {
+            email: 'rl-user@example.com',
+            name: 'RL User',
+            initials: 'RU',
+            passwordHash,
+            theme: 'dark',
+          },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            initials: true,
+            avatarUrl: true,
+            theme: true,
+          },
+        });
+      }
+
+      req.user = user;
       return next();
     }
 

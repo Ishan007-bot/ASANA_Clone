@@ -24,10 +24,10 @@
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.3",
     "postgres": "^3.4.7",
-    "socket.io": "^4.7.2"
+    "socket.io": "^4.7.2",
+    "@faker-js/faker": "^8.4.1"
   },
   "devDependencies": {
-    "@faker-js/faker": "^8.3.1",
     "nodemon": "^3.0.2",
     "prisma": "^5.7.1"
   }

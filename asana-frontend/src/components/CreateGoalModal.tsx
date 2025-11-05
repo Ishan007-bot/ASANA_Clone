@@ -1,27 +1,41 @@
 import { useState } from 'react';
 import BaseModal from './BaseModal';
+import goalsApi, { type Goal } from '../services/goalsApi';
 import '../styles/d3ki9tyy5l5ruj_cloudfront_net__root.css';
 
 interface CreateGoalModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onGoalCreated?: (goal: { id: string; title: string; timePeriod: string }) => void;
+  onGoalCreated?: (goal: Goal) => void;
 }
 
 function CreateGoalModal({ isOpen, onClose, onGoalCreated }: CreateGoalModalProps) {
   const [goalTitle, setGoalTitle] = useState('');
   const [timePeriod, setTimePeriod] = useState('Q4 FY25');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (goalTitle.trim()) {
-      onGoalCreated?.({
-        id: `goal-${Date.now()}`,
-        title: goalTitle,
+    if (!goalTitle.trim()) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      const newGoal = await goalsApi.create({
+        title: goalTitle.trim(),
         timePeriod,
       });
+      
+      onGoalCreated?.(newGoal);
       setGoalTitle('');
       onClose();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create goal';
+      setError(errorMessage);
+      console.error('Error creating goal:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -53,7 +67,7 @@ function CreateGoalModal({ isOpen, onClose, onGoalCreated }: CreateGoalModalProp
                 borderRadius: '6px',
                 border: '1px solid var(--border-primary)',
                 background: '#1E1F21',
-                color: 'rgb(245, 244, 243)',
+                color: '#000000',
                 fontSize: '14px',
                 fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica", "Arial", sans-serif',
               }}
@@ -81,7 +95,7 @@ function CreateGoalModal({ isOpen, onClose, onGoalCreated }: CreateGoalModalProp
                 borderRadius: '6px',
                 border: '1px solid var(--border-primary)',
                 background: '#1E1F21',
-                color: 'rgb(245, 244, 243)',
+                color: '#000000',
                 fontSize: '14px',
                 fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica", "Arial", sans-serif',
               }}
@@ -92,6 +106,20 @@ function CreateGoalModal({ isOpen, onClose, onGoalCreated }: CreateGoalModalProp
               <option value="Q3 FY26">Q3 FY26</option>
             </select>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div style={{
+              padding: '12px',
+              borderRadius: '6px',
+              backgroundColor: '#fee2e2',
+              border: '1px solid #fca5a5',
+              color: '#991b1b',
+              fontSize: '14px',
+            }}>
+              {error}
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px', paddingTop: '16px', borderTop: '1px solid var(--border-primary)' }}>
@@ -114,19 +142,21 @@ function CreateGoalModal({ isOpen, onClose, onGoalCreated }: CreateGoalModalProp
             </button>
             <button
               type="submit"
+              disabled={loading || !goalTitle.trim()}
               style={{
                 padding: '10px 20px',
                 borderRadius: '6px',
                 border: 'none',
-                background: 'var(--accent-primary)',
+                background: loading ? '#4a5568' : 'var(--accent-primary)',
                 color: 'white',
                 fontSize: '14px',
-                cursor: 'pointer',
+                cursor: loading ? 'wait' : 'pointer',
                 fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica", "Arial", sans-serif',
                 fontWeight: 500,
+                opacity: loading || !goalTitle.trim() ? 0.6 : 1,
               }}
             >
-              Create goal
+              {loading ? 'Creating...' : 'Create goal'}
             </button>
           </div>
         </div>

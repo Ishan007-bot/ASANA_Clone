@@ -5,6 +5,8 @@ import SortModal from '../components/SortModal';
 import ShareModal from '../components/ShareModal';
 import OptionsModal from '../components/OptionsModal';
 import CreateGoalModal from '../components/CreateGoalModal';
+import goalsApi, { type Goal } from '../services/goalsApi';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 import '../styles/d3ki9tyy5l5ruj_cloudfront_net__root.css';
 
 function Goals() {
@@ -19,12 +21,43 @@ function Goals() {
   const [showSortModal, setShowSortModal] = useState(false);
   const [showOptionsModal, setShowOptionsModal] = useState(false);
   const [showCreateGoalModal, setShowCreateGoalModal] = useState(false);
-  const [subgoals, setSubgoals] = useState([
-    { id: '1', title: '', timePeriod: 'Q4 FY25', team: 'sst.scaler.com' },
-    { id: '2', title: '', timePeriod: 'Q4 FY25', team: 'sst.scaler.com' },
-  ]);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadGoals = async () => {
+      try {
+        setLoading(true);
+        const fetchedGoals = await goalsApi.getAll();
+        setGoals(fetchedGoals);
+        if (fetchedGoals.length > 0) {
+          setGoalTitle(fetchedGoals[0].title);
+          setGoalCreated(true);
+        }
+      } catch (err) {
+        console.error('Error loading goals:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadGoals();
+  }, []);
+
+  const handleGoalCreated = (newGoal: Goal) => {
+    setGoals((prev) => [newGoal, ...prev]);
+    setGoalTitle(newGoal.title);
+    setGoalCreated(true);
+  };
   
-  const createdGoal = {
+  const createdGoal = goals.length > 0 ? {
+    id: goals[0].id,
+    title: goals[0].title,
+    progress: goals[0].progress || 0,
+    hasSubgoals: false,
+    timePeriod: goals[0].timePeriod,
+    workspace: 'My workspace',
+    owner: 'Ishan Ganguly',
+  } : {
     id: '1',
     title: goalTitle || 'wepfinnweripcn4',
     progress: 0,
@@ -1745,11 +1778,7 @@ function Goals() {
         <CreateGoalModal 
           isOpen={showCreateGoalModal} 
           onClose={() => setShowCreateGoalModal(false)}
-          onGoalCreated={(goal) => {
-            setGoalTitle(goal.title);
-            setGoalCreated(true);
-            setShowCreateGoalModal(false);
-          }}
+          onGoalCreated={handleGoalCreated}
         />
       </div>
     </Layout>

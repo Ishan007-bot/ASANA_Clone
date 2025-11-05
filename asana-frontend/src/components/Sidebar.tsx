@@ -19,17 +19,23 @@ function Sidebar({ isCollapsed = false }: SidebarProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Load projects
+  const loadProjects = async () => {
+    try {
+      const fetchedProjects = await projectsApi.getAll();
+      setProjects(fetchedProjects);
+    } catch (err) {
+      console.error('Error loading projects:', err);
+    }
+  };
+
   useEffect(() => {
-    const loadProjects = async () => {
-      try {
-        const fetchedProjects = await projectsApi.getAll();
-        setProjects(fetchedProjects);
-      } catch (err) {
-        console.error('Error loading projects:', err);
-      }
-    };
     loadProjects();
   }, []);
+
+  const handleProjectCreated = (newProject: Project) => {
+    // Add the new project to the list
+    setProjects((prev) => [newProject, ...prev]);
+  };
 
   const isActive = (path: string) => location.pathname === path;
   
@@ -380,10 +386,15 @@ function Sidebar({ isCollapsed = false }: SidebarProps) {
       <CreateProjectModal 
         isOpen={showCreateProjectModal} 
         onClose={() => setShowCreateProjectModal(false)}
+        onProjectCreated={handleProjectCreated}
       />
       <CreatePortfolioModal 
         isOpen={showCreatePortfolioModal} 
         onClose={() => setShowCreatePortfolioModal(false)}
+        onPortfolioCreated={(portfolio) => {
+          // Portfolio created - refresh would happen if we had a portfolios list in sidebar
+          console.log('Portfolio created:', portfolio);
+        }}
       />
     </div>
   );

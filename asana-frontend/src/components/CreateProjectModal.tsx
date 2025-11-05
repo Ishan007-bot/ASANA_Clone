@@ -1,17 +1,20 @@
 import { useState } from 'react';
 import BaseModal from './BaseModal';
+import projectsApi, { type Project } from '../services/projectsApi';
 import '../styles/d3ki9tyy5l5ruj_cloudfront_net__root.css';
 
 interface CreateProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onProjectCreated?: (project: { id: string; name: string }) => void;
+  onProjectCreated?: (project: Project) => void;
 }
 
 function CreateProjectModal({ isOpen, onClose, onProjectCreated }: CreateProjectModalProps) {
   const [projectName, setProjectName] = useState('');
   const [description, setDescription] = useState('');
   const [color, setColor] = useState('aqua');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const colors = [
     { value: 'aqua', label: 'Aqua', hex: '#06b6d4' },
@@ -24,16 +27,31 @@ function CreateProjectModal({ isOpen, onClose, onProjectCreated }: CreateProject
     { value: 'purple', label: 'Purple', hex: '#a855f7' },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (projectName.trim()) {
-      onProjectCreated?.({
-        id: `project-${Date.now()}`,
-        name: projectName,
+    if (!projectName.trim()) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      const newProject = await projectsApi.create({
+        name: projectName.trim(),
+        description: description.trim() || undefined,
+        color: color || undefined,
+        view_type: 'list',
       });
+      
+      onProjectCreated?.(newProject);
       setProjectName('');
       setDescription('');
+      setColor('aqua');
       onClose();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create project';
+      setError(errorMessage);
+      console.error('Error creating project:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,7 +83,7 @@ function CreateProjectModal({ isOpen, onClose, onProjectCreated }: CreateProject
                 borderRadius: '6px',
                 border: '1px solid var(--border-primary)',
                 background: '#1E1F21',
-                color: 'rgb(245, 244, 243)',
+                color: '#000000',
                 fontSize: '14px',
                 fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica", "Arial", sans-serif',
               }}
@@ -95,7 +113,7 @@ function CreateProjectModal({ isOpen, onClose, onProjectCreated }: CreateProject
                 borderRadius: '6px',
                 border: '1px solid var(--border-primary)',
                 background: '#1E1F21',
-                color: 'rgb(245, 244, 243)',
+                color: '#000000',
                 fontSize: '14px',
                 fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica", "Arial", sans-serif',
                 resize: 'vertical',
@@ -144,6 +162,20 @@ function CreateProjectModal({ isOpen, onClose, onProjectCreated }: CreateProject
             </div>
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div style={{
+              padding: '12px',
+              borderRadius: '6px',
+              backgroundColor: '#fee2e2',
+              border: '1px solid #fca5a5',
+              color: '#991b1b',
+              fontSize: '14px',
+            }}>
+              {error}
+            </div>
+          )}
+
           {/* Action Buttons */}
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px', paddingTop: '16px', borderTop: '1px solid var(--border-primary)' }}>
             <button
@@ -165,19 +197,21 @@ function CreateProjectModal({ isOpen, onClose, onProjectCreated }: CreateProject
             </button>
             <button
               type="submit"
+              disabled={loading || !projectName.trim()}
               style={{
                 padding: '10px 20px',
                 borderRadius: '6px',
                 border: 'none',
-                background: 'var(--accent-primary)',
+                background: loading ? '#4a5568' : 'var(--accent-primary)',
                 color: 'white',
                 fontSize: '14px',
-                cursor: 'pointer',
+                cursor: loading ? 'wait' : 'pointer',
                 fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica", "Arial", sans-serif',
                 fontWeight: 500,
+                opacity: loading || !projectName.trim() ? 0.6 : 1,
               }}
             >
-              Create project
+              {loading ? 'Creating...' : 'Create project'}
             </button>
           </div>
         </div>

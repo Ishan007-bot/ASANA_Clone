@@ -225,7 +225,7 @@ function FilterBar({ filters, onFiltersChange, availableAssignees = [], availabl
           border: '1px solid #e5e7eb',
           cursor: 'pointer',
           backgroundColor: isExpanded ? '#252628' : '#2A2B2D',
-          color: '#374151',
+          color: 'rgb(245, 244, 243)',
           fontSize: '13px',
           fontWeight: 400,
           height: '36px',
@@ -237,13 +237,13 @@ function FilterBar({ filters, onFiltersChange, availableAssignees = [], availabl
         }}
         onMouseEnter={(e) => {
           if (!isExpanded) {
-            e.currentTarget.style.backgroundColor = '#f9fafb';
+            e.currentTarget.style.backgroundColor = '#252628';
             e.currentTarget.style.borderColor = '#d1d5db';
           }
         }}
         onMouseLeave={(e) => {
           if (!isExpanded) {
-            e.currentTarget.style.backgroundColor = 'white';
+            e.currentTarget.style.backgroundColor = '#2A2B2D';
             e.currentTarget.style.borderColor = '#e5e7eb';
           }
         }}
@@ -272,12 +272,12 @@ function FilterBar({ filters, onFiltersChange, availableAssignees = [], availabl
             whiteSpace: 'nowrap',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#fef2f2';
+            e.currentTarget.style.backgroundColor = '#3a1f1f';
             e.currentTarget.style.borderColor = '#f87171';
-            e.currentTarget.style.color = '#dc2626';
+            e.currentTarget.style.color = '#fca5a5';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'white';
+            e.currentTarget.style.backgroundColor = '#2A2B2D';
             e.currentTarget.style.borderColor = '#fecaca';
             e.currentTarget.style.color = '#ef4444';
           }}

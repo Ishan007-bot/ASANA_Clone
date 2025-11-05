@@ -1016,6 +1016,36 @@ select:focus {
   transition: all 0.2s ease;
 }
 
+/* Make all input, textarea, and select text black */
+input,
+textarea,
+select,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="url"],
+input[type="tel"],
+textarea,
+select,
+.TextInput,
+.TextInputBase,
+.SizedTextInput,
+.SearchTextInput,
+.ProjectDirectoryTypeahead-input,
+.ValidatedInput input,
+.ValidatedInput textarea,
+.ValidatedInput select,
+.FormRowLayout input,
+.FormRowLayout textarea,
+.FormRowLayout select {
+  color: #000000 !important;
+  color: rgb(0, 0, 0) !important;
+}
+
 /* Smooth view transitions */
 .view-transition {
   animation: fadeIn 0.3s ease-in-out;
@@ -1275,8 +1305,5 @@ button {
     padding: 0 !important;
   }
   
-  * {
-    background: white !important;
-    color: black !important;
-  }
+  /* Removed forced white background - using dark theme instead */
 }

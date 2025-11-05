@@ -62,6 +62,7 @@ function CommentForm({ taskId, placeholder = 'Add a comment...', onSubmit, onCan
           fontFamily: 'inherit',
           fontSize: '14px',
           lineHeight: '1.5',
+          color: '#000000',
         }}
       />
       {showButtons && (

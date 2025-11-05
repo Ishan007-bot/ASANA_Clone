@@ -18,7 +18,8 @@ function TaskForm({ task, initialTask, projectId, onSubmit, onSave, onCancel }: 
   const [name, setName] = useState(initialData?.name || '');
   const [description, setDescription] = useState(initialData?.description || '');
   const [dueDate, setDueDate] = useState(initialData?.dueDate ? initialData.dueDate.split('T')[0] : '');
-  const [assignee, setAssignee] = useState(initialData?.assignee || '');
+  const [assigneeId, setAssigneeId] = useState<string | undefined>(undefined);
+  const [assigneeDisplay, setAssigneeDisplay] = useState<string>('');
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>(initialData?.priority || 'medium');
   const [tags, setTags] = useState(initialData?.tags?.join(', ') || '');
   const [loading, setLoading] = useState(false);
@@ -28,6 +29,22 @@ function TaskForm({ task, initialTask, projectId, onSubmit, onSave, onCancel }: 
   const [userSearch, setUserSearch] = useState('');
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+
+  // Initialize assignee display from initial data
+  useEffect(() => {
+    if (initialData?.assignee) {
+      // Try to find user by name/email to get ID
+      const foundUser = users.find(u => 
+        u.name === initialData.assignee || u.email === initialData.assignee
+      );
+      if (foundUser) {
+        setAssigneeId(foundUser.id);
+        setAssigneeDisplay(foundUser.name || foundUser.email);
+      } else {
+        setAssigneeDisplay(initialData.assignee);
+      }
+    }
+  }, [initialData, users]);
 
   // Load users for assignment
   useEffect(() => {
@@ -68,7 +85,7 @@ function TaskForm({ task, initialTask, projectId, onSubmit, onSave, onCancel }: 
         name: name.trim(),
         description: description.trim() || undefined,
         dueDate: dueDate || undefined,
-        assignee: assignee || undefined,
+        assignee: assigneeId || undefined, // Store user ID, not name/email
         priority,
         tags: tags ? tags.split(',').map(t => t.trim()).filter(t => t) : undefined,
         projectId: projectId || initialData?.projectId,
@@ -89,7 +106,8 @@ function TaskForm({ task, initialTask, projectId, onSubmit, onSave, onCancel }: 
   };
 
   const handleUserSelect = (user: User) => {
-    setAssignee(user.name || user.email);
+    setAssigneeId(user.id);
+    setAssigneeDisplay(user.name || user.email);
     setUserSearch('');
     setShowUserDropdown(false);
   };
@@ -112,7 +130,7 @@ function TaskForm({ task, initialTask, projectId, onSubmit, onSave, onCancel }: 
             borderRadius: '6px',
             border: '1px solid var(--border-primary)',
             background: '#2A2B2D',
-            color: 'rgb(245, 244, 243)',
+            color: '#000000',
             fontSize: '14px',
           }}
         />
@@ -133,7 +151,7 @@ function TaskForm({ task, initialTask, projectId, onSubmit, onSave, onCancel }: 
             borderRadius: '6px',
             border: '1px solid var(--border-primary)',
             background: '#2A2B2D',
-            color: 'rgb(245, 244, 243)',
+            color: '#000000',
             fontSize: '14px',
             resize: 'vertical',
             fontFamily: 'inherit',
@@ -156,7 +174,7 @@ function TaskForm({ task, initialTask, projectId, onSubmit, onSave, onCancel }: 
               borderRadius: '6px',
               border: '1px solid var(--border-primary)',
               background: '#2A2B2D',
-              color: 'rgb(245, 244, 243)',
+              color: '#000000',
               fontSize: '14px',
             }}
           />
@@ -175,7 +193,7 @@ function TaskForm({ task, initialTask, projectId, onSubmit, onSave, onCancel }: 
               borderRadius: '6px',
               border: '1px solid var(--border-primary)',
               background: '#2A2B2D',
-              color: 'rgb(245, 244, 243)',
+              color: '#000000',
               fontSize: '14px',
               cursor: 'pointer',
             }}
@@ -193,11 +211,15 @@ function TaskForm({ task, initialTask, projectId, onSubmit, onSave, onCancel }: 
         </label>
         <input
           type="text"
-          value={assignee}
+          value={assigneeDisplay}
           onChange={(e) => {
-            setAssignee(e.target.value);
+            setAssigneeDisplay(e.target.value);
             setUserSearch(e.target.value);
             setShowUserDropdown(true);
+            // Clear assignee ID if user is typing manually
+            if (!filteredUsers.some(u => (u.name || u.email) === e.target.value)) {
+              setAssigneeId(undefined);
+            }
           }}
           onFocus={() => setShowUserDropdown(true)}
           placeholder="Enter name or email"
@@ -207,7 +229,7 @@ function TaskForm({ task, initialTask, projectId, onSubmit, onSave, onCancel }: 
             borderRadius: '6px',
             border: '1px solid var(--border-primary)',
             background: '#2A2B2D',
-            color: 'rgb(245, 244, 243)',
+            color: '#000000',
             fontSize: '14px',
           }}
         />
@@ -256,11 +278,12 @@ function TaskForm({ task, initialTask, projectId, onSubmit, onSave, onCancel }: 
             ))}
           </div>
         )}
-        {assignee && (
+        {assigneeDisplay && (
           <button
             type="button"
             onClick={() => {
-              setAssignee('');
+              setAssigneeDisplay('');
+              setAssigneeId(undefined);
               setUserSearch('');
             }}
             style={{
@@ -294,7 +317,7 @@ function TaskForm({ task, initialTask, projectId, onSubmit, onSave, onCancel }: 
             borderRadius: '6px',
             border: '1px solid var(--border-primary)',
             background: '#2A2B2D',
-            color: 'rgb(245, 244, 243)',
+            color: '#000000',
             fontSize: '14px',
           }}
         />

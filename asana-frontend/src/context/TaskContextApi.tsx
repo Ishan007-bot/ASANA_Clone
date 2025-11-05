@@ -305,26 +305,48 @@ export function TaskProviderApi({ children }: { children: ReactNode }) {
         const task = tasks.find((t) => t.id === id);
         if (!task) return;
 
+        // Save current state for rollback
+        previousTasksRef.current = [...tasks];
+
         // Optimistic update
         setTasks((prev) => {
           const index = prev.findIndex((t) => t.id === id);
           if (index >= 0) {
             const updated = [...prev];
-            updated[index] = { ...updated[index], completed: !updated[index].completed };
+            updated[index] = { ...updated[index], completed: !updated[index].completed, updatedAt: new Date().toISOString() };
             return updated;
           }
           return prev;
         });
 
-        await tasksApi.toggleCompletion(id);
+        // Try WebSocket first, fallback to REST API
+        if (wsService.isConnected()) {
+          wsService.updateTaskViaSocket(id, {
+            completed: !task.completed,
+          });
+          // WebSocket will handle the response via the task:updated event
+        } else {
+          // Fallback to REST API
+          const updatedTask = await tasksApi.toggleCompletion(id);
+          // Replace with server response to ensure consistency
+          setTasks((prev) => {
+            const index = prev.findIndex((t) => t.id === id);
+            if (index >= 0) {
+              const updated = [...prev];
+              updated[index] = updatedTask;
+              return updated;
+            }
+            return prev;
+          });
+        }
       } catch (err) {
-        // Rollback - reload tasks
-        await loadTasks();
+        // Rollback
+        setTasks(previousTasksRef.current);
         const errorMessage = err instanceof Error ? err.message : 'Failed to update task';
         showToastSafe(errorMessage, 'error');
       }
     },
-    [tasks, loadTasks]
+    [tasks]
   );
 
   const getTasksByProject = useCallback(

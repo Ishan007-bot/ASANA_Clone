@@ -1,27 +1,26 @@
-# Backend Dockerfile
-FROM node:18-alpine
+FROM node:20-bookworm-slim
 
-# Set working directory
+# OpenSSL for Prisma
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-# Copy package files
+# Only copy dependency manifests first (enables layer caching)
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install exactly what's in the lockfile
+RUN npm ci
 
-# Copy Prisma schema
-COPY prisma ./prisma
-
-# Generate Prisma Client
-RUN npx prisma generate
-
-# Copy application code
+# Then copy the rest
 COPY . .
 
-# Expose port
+# Generate Prisma client
+RUN npx prisma generate
+
+ENV NODE_ENV=production
+
 EXPOSE 8000
 
-# Start server
-CMD ["node", "index.js"]
-
+CMD ["sh","-c","npx prisma db push --accept-data-loss && sleep 2 && node index.js"]

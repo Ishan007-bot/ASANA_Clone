@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import CreatePortfolioModal from '../components/CreatePortfolioModal';
 import FilterModal from '../components/FilterModal';
 import OptionsModal from '../components/OptionsModal';
+import portfoliosApi, { type Portfolio } from '../services/portfoliosApi';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 import '../styles/d3ki9tyy5l5ruj_cloudfront_net__root.css';
 
 function Portfolios() {
@@ -13,16 +15,27 @@ function Portfolios() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showOptionsModal, setShowOptionsModal] = useState(false);
+  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const portfolios = [
-    {
-      id: '1',
-      name: 'My first portfolio',
-      projectCount: 1,
-      status: 'Joined',
-      members: [{ id: '1', initials: 'IG', color: 0 }],
-    },
-  ];
+  useEffect(() => {
+    const loadPortfolios = async () => {
+      try {
+        setLoading(true);
+        const fetchedPortfolios = await portfoliosApi.getAll();
+        setPortfolios(fetchedPortfolios);
+      } catch (err) {
+        console.error('Error loading portfolios:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPortfolios();
+  }, []);
+
+  const handlePortfolioCreated = (newPortfolio: Portfolio) => {
+    setPortfolios((prev) => [newPortfolio, ...prev]);
+  };
 
   return (
     <Layout>
@@ -263,7 +276,16 @@ function Portfolios() {
 
             {/* Table Rows */}
             <div>
-              {portfolios.map((portfolio) => (
+              {loading ? (
+                <div style={{ padding: '40px', textAlign: 'center' }}>
+                  <LoadingSpinner />
+                </div>
+              ) : portfolios.length === 0 ? (
+                <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-tertiary)' }}>
+                  <p>No portfolios yet. Create one to get started!</p>
+                </div>
+              ) : (
+                portfolios.map((portfolio) => (
                 <div
                   key={portfolio.id}
                   style={{
@@ -284,65 +306,48 @@ function Portfolios() {
                 >
                   {/* Name Column */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <svg aria-hidden="true" className="Icon" style={{ width: '24px', height: '24px', color: 'rgba(245, 244, 243, 0.6)' }} viewBox="0 0 24 24">
-                      <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2h-8l-2-2z" fill="currentColor"></path>
-                    </svg>
-                    <div>
-                      <div style={{
-                        fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica", "Arial", sans-serif',
-                        fontWeight: 400,
-                        color: 'rgb(245, 244, 243)',
-                        fontSize: '14px',
-                        marginBottom: '4px',
-                      }}>{portfolio.name}</div>
-                      <div style={{
-                        fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica", "Arial", sans-serif',
-                        fontWeight: 400,
-                        color: '#10b981',
-                        fontSize: '12px',
-                      }}>{portfolio.status}</div>
+                    <div style={{
+                      fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica", "Arial", sans-serif',
+                      fontWeight: 400,
+                      color: 'rgb(245, 244, 243)',
+                      fontSize: '14px',
+                    }}>
+                      {portfolio.name}
                     </div>
                   </div>
-
-                  {/* Members Column */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                    {portfolio.members.map((member) => (
-                      <div
-                        key={member.id}
-                        className="Avatar AvatarPhoto AvatarPhoto--default AvatarPhoto--small AvatarPhoto--color0"
-                        style={{
-                          width: '24px',
-                          height: '24px',
-                          borderRadius: '50%',
-                          background: 'var(--avatar-pink)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0,
-                        }}
-                      >
-                        <span className="AvatarPhoto-initials" style={{ color: 'var(--text-inverse)', fontSize: '10px', fontWeight: 500 }}>
-                          {member.initials}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Parent portfolios Column */}
+                  {/* Members Column - placeholder */}
                   <div style={{
-                    textAlign: 'center',
+                    fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica", "Arial", sans-serif',
+                    fontWeight: 400,
                     color: 'var(--text-tertiary)',
                     fontSize: '14px',
-                  }}>-</div>
-
+                    textAlign: 'center',
+                  }}>
+                    -
+                  </div>
+                  {/* Parent portfolios Column - placeholder */}
+                  <div style={{
+                    fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica", "Arial", sans-serif',
+                    fontWeight: 400,
+                    color: 'var(--text-tertiary)',
+                    fontSize: '14px',
+                    textAlign: 'center',
+                  }}>
+                    -
+                  </div>
                   {/* Last modified Column */}
                   <div style={{
-                    textAlign: 'right',
+                    fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica", "Arial", sans-serif',
+                    fontWeight: 400,
                     color: 'var(--text-tertiary)',
-                    fontSize: '14px',
-                  }}>-</div>
+                    fontSize: '12px',
+                    textAlign: 'right',
+                  }}>
+                    {portfolio.updatedAt ? new Date(portfolio.updatedAt).toLocaleDateString() : '-'}
+                  </div>
                 </div>
-              ))}
+              ))
+              )}
             </div>
           </div>
         )}
@@ -422,6 +427,7 @@ function Portfolios() {
               }}>
                 {/* New Portfolio Card */}
                 <div
+                  onClick={() => setShowCreateModal(true)}
                   style={{
                     backgroundColor: '#1E1F21',
                     borderRadius: '8px',
@@ -454,9 +460,10 @@ function Portfolios() {
                   </div>
                 </div>
 
-                {/* My first portfolio Card */}
-                {portfolios[0] && (
+                {/* Portfolio Cards */}
+                {portfolios.slice(0, 3).map((portfolio) => (
                   <div
+                    key={portfolio.id}
                     style={{
                       backgroundColor: '#2A2B2D',
                       borderRadius: '8px',
@@ -498,18 +505,21 @@ function Portfolios() {
                       margin: 0,
                       marginBottom: '8px',
                     }}>
-                      {portfolios[0].name}
+                      {portfolio.name}
                     </h3>
                     
-                    {/* Project Count */}
-                    <div style={{
-                      color: 'var(--text-tertiary)',
-                      fontSize: '13px',
-                    }}>
-                      {portfolios[0].projectCount} project
-                    </div>
+                    {/* Description */}
+                    {portfolio.description && (
+                      <div style={{
+                        color: 'var(--text-tertiary)',
+                        fontSize: '13px',
+                        marginBottom: '8px',
+                      }}>
+                        {portfolio.description}
+                      </div>
+                    )}
                   </div>
-                )}
+                ))}
               </div>
             )}
           </div>
@@ -520,7 +530,7 @@ function Portfolios() {
           style={{
             position: 'fixed',
             bottom: '24px',
-            left: '280px', // Adjust based on sidebar width
+            left: '280px',
             zIndex: 1000,
           }}
         >
@@ -581,10 +591,16 @@ function Portfolios() {
             )}
           </div>
         </div>
+
+        {/* Modals */}
+        <FilterModal isOpen={showFilterModal} onClose={() => setShowFilterModal(false)} />
+        <OptionsModal isOpen={showOptionsModal} onClose={() => setShowOptionsModal(false)} />
+        <CreatePortfolioModal 
+          isOpen={showCreateModal} 
+          onClose={() => setShowCreateModal(false)}
+          onPortfolioCreated={handlePortfolioCreated}
+        />
       </div>
-      <CreatePortfolioModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} />
-      <FilterModal isOpen={showFilterModal} onClose={() => setShowFilterModal(false)} />
-      <OptionsModal isOpen={showOptionsModal} onClose={() => setShowOptionsModal(false)} />
     </Layout>
   );
 }

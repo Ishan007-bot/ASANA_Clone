@@ -21,14 +21,14 @@ services:
     networks:
       - asana-network
 
-  # Backend API
+  # Backend API backend api server 
   backend:
     build:
       context: ./asana-backend
       dockerfile: Dockerfile
     container_name: asana-backend
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/asana_clone?schema=public
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/asana_clone
       - PORT=8000
       - CORS_ORIGIN=http://localhost:3000
       - JWT_SECRET=docker-jwt-secret-change-in-production
@@ -71,4 +71,3 @@ volumes:
 networks:
   asana-network:
     driver: bridge
-

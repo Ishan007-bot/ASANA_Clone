@@ -86,7 +86,7 @@ function Search() {
                 borderRadius: '8px',
                 border: '1px solid var(--border-primary)',
                 background: '#2A2B2D',
-                color: 'rgb(245, 244, 243)',
+                color: '#000000',
                 fontSize: '16px',
               }}
             />
