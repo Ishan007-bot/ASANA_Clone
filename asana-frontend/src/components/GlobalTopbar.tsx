@@ -259,7 +259,7 @@ function GlobalTopbar({ onToggleSidebar, sidebarVisible = true, onTaskCreated }:
                     ) : (
                       <button
                         key={item.label}
-                        onClick={() => { setShowUserMenu(false); item.action(); }}
+                        onClick={() => { setShowUserMenu(false); if ('action' in item && item.action) { item.action(); } }}
                         style={{
                           width: '100%',
                           padding: '10px 16px',
