@@ -253,13 +253,15 @@ function GlobalTopbar({ onToggleSidebar, sidebarVisible = true, onTaskCreated }:
                     { label: 'Add another account', action: () => window.open('/login', '_blank') },
                     { divider: true },
                     { label: 'Log out', action: () => { authService.logout(); navigate('/login'); } },
-                  ].map((item, idx) => (
-                    item.divider ? (
-                      <div key={`d_${idx}`} style={{ height: '1px', background: 'var(--border-primary)' }} />
-                    ) : (
+                  ].map((item, idx) => {
+                    if (item.divider) {
+                      return <div key={`d_${idx}`} style={{ height: '1px', background: 'var(--border-primary)' }} />;
+                    }
+                    const menuItem = item as { label: string; action: () => void };
+                    return (
                       <button
-                        key={item.label}
-                        onClick={() => { setShowUserMenu(false); if ('action' in item && item.action) { item.action(); } }}
+                        key={menuItem.label}
+                        onClick={() => { setShowUserMenu(false); menuItem.action(); }}
                         style={{
                           width: '100%',
                           padding: '10px 16px',
@@ -273,10 +275,10 @@ function GlobalTopbar({ onToggleSidebar, sidebarVisible = true, onTaskCreated }:
                         onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#252628')}
                         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                       >
-                        {item.label}
+                        {menuItem.label}
                       </button>
-                    )
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
