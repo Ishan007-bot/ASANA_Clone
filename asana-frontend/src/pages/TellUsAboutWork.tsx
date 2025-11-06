@@ -17,7 +17,7 @@ function TellUsAboutWork() {
   const isContinueDisabled = !role || !functionType || !useCase;
 
   return (
-    <div style={{
+    <div className="onboarding-page" style={{
       display: 'flex',
       minHeight: '100vh',
       backgroundColor: '#ffffff',
@@ -91,7 +91,7 @@ function TellUsAboutWork() {
                   borderRadius: '6px',
                   border: '1px solid #cfcfcf',
                   backgroundColor: '#ffffff',
-                  color: '#3d3d3d',
+                  color: '#000000',
                   fontFamily: 'inherit',
                   outline: 'none',
                   appearance: 'none',
@@ -154,7 +154,7 @@ function TellUsAboutWork() {
                   borderRadius: '6px',
                   border: '1px solid #cfcfcf',
                   backgroundColor: '#ffffff',
-                  color: '#3d3d3d',
+                  color: '#000000',
                   fontFamily: 'inherit',
                   outline: 'none',
                   appearance: 'none',
@@ -220,7 +220,7 @@ function TellUsAboutWork() {
                   borderRadius: '6px',
                   border: '1px solid #cfcfcf',
                   backgroundColor: '#ffffff',
-                  color: '#3d3d3d',
+                  color: '#000000',
                   fontFamily: 'inherit',
                   outline: 'none',
                   appearance: 'none',

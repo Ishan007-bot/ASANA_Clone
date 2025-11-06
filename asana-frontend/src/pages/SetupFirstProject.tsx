@@ -18,7 +18,7 @@ function SetupFirstProject() {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#ffffff', fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica", "Arial", sans-serif' }}>
+    <div className="onboarding-page" style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#ffffff', fontFamily: '"Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Helvetica", "Arial", sans-serif' }}>
       {/* Left Panel */}
       <div style={{ flex: '0 0 38%', padding: '40px 60px', backgroundColor: '#ffffff' }}>
         {/* Logo */}

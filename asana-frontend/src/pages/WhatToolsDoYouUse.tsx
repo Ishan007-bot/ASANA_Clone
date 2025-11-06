@@ -162,7 +162,7 @@ function WhatToolsDoYouUse() {
   };
 
   return (
-    <div style={{
+    <div className="onboarding-page" style={{
       display: 'flex',
       minHeight: '100vh',
       backgroundColor: '#ffffff',

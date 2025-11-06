@@ -54,7 +54,7 @@ function Welcome() {
   const isContinueDisabled = fullName.trim() === '';
 
   return (
-    <div style={{
+    <div className="onboarding-page" style={{
       display: 'flex',
       minHeight: '100vh',
       backgroundColor: '#ffffff',
@@ -228,7 +228,7 @@ function Welcome() {
                 borderRadius: '6px',
                 border: showError ? '2px solid #ff5263' : '1px solid #cfcfcf',
                 backgroundColor: '#ffffff',
-                color: '#3d3d3d',
+                color: '#000000',
                 fontFamily: 'inherit',
                 outline: 'none',
                 transition: 'border-color 0.2s'

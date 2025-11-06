@@ -1338,3 +1338,60 @@ input::placeholder,
 textarea::placeholder {
   color: rgba(245, 244, 243, 0.6) !important;
 }
+
+/* Onboarding pages - placeholder color for white backgrounds */
+.onboarding-page input::placeholder,
+.onboarding-page textarea::placeholder,
+#Login-appRoot input::placeholder,
+#Login-appRoot textarea::placeholder {
+  color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Onboarding pages - force black text on inputs (white background pages) */
+/* These selectors have higher specificity than the global white text rule */
+.onboarding-page input,
+.onboarding-page textarea,
+.onboarding-page select,
+.onboarding-page input[type="text"],
+.onboarding-page input[type="email"],
+.onboarding-page input[type="password"],
+.onboarding-page input[type="search"],
+.onboarding-page input[type="number"],
+.onboarding-page input[type="date"],
+.onboarding-page input[type="time"],
+.onboarding-page input[type="url"],
+.onboarding-page input[type="tel"],
+.onboarding-page .TextInput,
+.onboarding-page .TextInputBase,
+.onboarding-page .SizedTextInput,
+.onboarding-page .SearchTextInput,
+.onboarding-page .ProjectDirectoryTypeahead-input,
+.onboarding-page .ValidatedInput input,
+.onboarding-page .ValidatedInput textarea,
+.onboarding-page .ValidatedInput select,
+.onboarding-page .FormRowLayout input,
+.onboarding-page .FormRowLayout textarea,
+.onboarding-page .FormRowLayout select,
+#Login-appRoot input,
+#Login-appRoot textarea,
+#Login-appRoot select,
+#Login-appRoot .TextInput,
+#Login-appRoot .TextInputBase,
+#Login-appRoot .SizedTextInput,
+#Login-appRoot .ValidatedInput input,
+#Login-appRoot .ValidatedInput textarea,
+#Login-appRoot .ValidatedInput select,
+#Login-appRoot .FormRowLayout input,
+#Login-appRoot .FormRowLayout textarea,
+#Login-appRoot .FormRowLayout select,
+.LoginEmailForm input,
+.LoginEmailForm textarea,
+.LoginEmailForm select,
+.LoginEmailForm .TextInput,
+.LoginEmailForm .TextInputBase,
+.LoginEmailForm .SizedTextInput,
+.LoginEmailForm .ValidatedInput input,
+.LoginEmailForm-emailInput {
+  color: #000000 !important;
+  caret-color: #000000 !important;
+}
