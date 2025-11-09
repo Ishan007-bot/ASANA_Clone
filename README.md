@@ -27,7 +27,7 @@ A high-fidelity Asana clone built with React (TypeScript) frontend and Node.js/E
 ## 🎯 Overview
 
 This is a complete Asana clone with:
-- **Frontend**: React + TypeScript + Vite (modern, responsive UI)
+- **Frontend**: React + TypeScript + Vite (modern and responsive UI)
 - **Backend**: Node.js + Express + Prisma + PostgreSQL
 - **Real-time**: Socket.io for WebSocket support
 - **Authentication**: JWT-based authentication
