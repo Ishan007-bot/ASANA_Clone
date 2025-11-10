@@ -105,7 +105,7 @@ new scrapper/
 - PostgreSQL database (Supabase recommended)
 - Git
 
-### 1.  Clone & Install
+### 1. Clone & Install
 
 ```bash
 # Navigate to project root
