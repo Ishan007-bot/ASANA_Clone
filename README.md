@@ -43,7 +43,7 @@ Perfect for :
 
 ## 🔗 Live Demo
 
-Access the deployed app here: [asana-clone-six.vercel.app/login](https://asana-clone-six.vercel.app/login)
+Access the deployed app here : [asana-clone-six.vercel.app/login](https://asana-clone-six.vercel.app/login)
 
 ---
 
