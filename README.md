@@ -33,7 +33,7 @@ This is a complete Asana clone with:
 - **Authentication**: JWT-based authentication
 - **High-Fidelity Data**: Comprehensive seed script for realistic training data
 
-Perfect for:
+Perfect for :
 - ✅ Production-ready task management
 - ✅ Reinforcement learning model training
 - ✅ Real-time collaboration
