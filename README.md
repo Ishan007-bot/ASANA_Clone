@@ -122,14 +122,14 @@ npm install
 
 ### 2. Configure Environment
 
-**Frontend** (create `asana-clone/.env`):
+**Frontend** (create `asana-clone/.env`) :
 ```env
 VITE_API_URL=http://localhost:8000/api
 VITE_WS_URL=localhost:8000
 VITE_USE_API=true
 ```
-
-**Backend** (create `asana-backend/.env`):
+ 
+**Backend** (create `asana-backend/.env`) :
 ```env
 DATABASE_URL="postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.co:5432/postgres?schema=public&sslmode=require"
 PORT=8000
