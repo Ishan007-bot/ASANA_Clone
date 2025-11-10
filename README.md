@@ -254,14 +254,14 @@ npm run seed         # Seed database with high-fidelity data
 4. **Important Notes**
    - Use port **5432** (direct connection)
    - Add `?schema=public&sslmode=require` at the end
-   - URL-encode special characters in password:
+   - URL-encode special characters in password :
      - `@` → `%40`
      - `#` → `%23`
      - `%` → `%25`
 
 ### Database Schema
 
-The Prisma schema includes:
+The Prisma schema includes :
 - **Users** - User accounts with authentication
 - **Workspaces** - Top-level organization containers
 - **Teams** - Team structures within workspaces
@@ -283,7 +283,7 @@ cd asana-backend
 npm run seed
 ```
 
-### Option 2: Via API Endpoint (If direct Prisma fails)
+### Option 2 : Via API Endpoint (If direct Prisma fails)
 
 **Using Postman:**
 1. Method: `POST`
@@ -303,7 +303,7 @@ Invoke-WebRequest -Uri "http://localhost:8000/api/seed" -Method POST
 
 ### Seed Data Generated
 
-The seed script creates:
+The seed script creates :
 - **50 users** - Realistic user profiles
 - **5 workspaces** - Organization containers
 - **~15 teams** - Team structures
